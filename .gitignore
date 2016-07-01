@@ -12,5 +12,7 @@
 hs_err_pid*
 
 .idea/
-.iml
-test
+AlphaGallery/AlphaGallery.iml
+test/
+AlphaGallery/target
+AlphaGallery/src/test
