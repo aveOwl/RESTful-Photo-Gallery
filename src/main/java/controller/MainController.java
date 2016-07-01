@@ -1,4 +1,4 @@
-package com.spring.boot.controller;
+package controller;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
