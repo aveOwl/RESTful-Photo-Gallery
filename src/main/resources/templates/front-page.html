@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+          href="../static/css/bootstrap.min.css" />
+</head>
+<body>
+
+<div th:replace="fragments/header :: header"></div>
+
+<div class="container">
+    <div class="text-center">
+        <form role="form" th:action="@{/photo/gallery}" method="post">
+                <h1 class="page-header text-info">Type your pic folder</h1>
+            <div class="row">
+                <input type="text" class="form-control" placeholder="C:\photos\mypics" />
+            </div>
+            <h2 class="text-info">and create your gallery</h2>
+            <div class="row">
+                <button class="btn btn-primary" type="submit">Create Gallery</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
+</html>

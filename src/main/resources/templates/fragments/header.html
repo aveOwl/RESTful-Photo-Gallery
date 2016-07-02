@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav class="navbar navbar-inverse" th:fragment="header">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand" th:href="@{/photo}">Photo Gallery</a>
+        </div>
+        <div id="navbar">
+            <ul class="nav navbar-nav">
+                <li class="active"><a th:href="@{/photo}">Home</a></li>
+            </ul>
+            <ul class="nav navbar-nav">
+                <li><a th:href="@{/photo/gallery}">My Photos</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
