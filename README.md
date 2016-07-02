@@ -6,5 +6,6 @@
 * [Spring Boot + Embedded Tomcat](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
 * [Spring Thymeleaf](http://www.thymeleaf.org/documentation.html)
 * [Bootstrap](http://getbootstrap.com/)
+
 **Reference**
 * [Thumbnail Gallery](http://blackrockdigital.github.io/startbootstrap-thumbnail-gallery/#)
