@@ -1,0 +1,31 @@
+11:12:59 INFO  com.gallery.restful.SpringBootWebApplication: Starting SpringBootWebApplication on olivia with PID 9019 (/home/ave/JavaPractice/RESTful-Photo-Gallery/target/classes started by ave in /home/ave/JavaPractice/RESTful-Photo-Gallery)
+11:12:59 DEBUG com.gallery.restful.SpringBootWebApplication: Running with Spring Boot v1.3.5.RELEASE, Spring v4.2.6.RELEASE
+11:12:59 INFO  com.gallery.restful.SpringBootWebApplication: No active profile set, falling back to default profiles: default
+11:13:02 INFO  gallery.restful.controller.MainController: initializing resourceLoader
+11:13:04 INFO  com.gallery.restful.SpringBootWebApplication: deleting ROOT directory
+11:13:04 INFO  com.gallery.restful.SpringBootWebApplication: creating new ROOT directory
+11:13:04 INFO  com.gallery.restful.SpringBootWebApplication: Started SpringBootWebApplication in 5.048 seconds (JVM running for 9.45)
+11:13:06 INFO  gallery.restful.controller.MainController: rendering main page
+11:13:09 DEBUG gallery.restful.controller.MainController: loading files from directory by given path: /home/ave/Pictures
+11:13:09 DEBUG gallery.restful.service.ScanDirectory: searching for files with png extension in directory: /home/ave/Pictures and its subdirectories
+11:13:09 DEBUG gallery.restful.service.ScanDirectory: found 8 files: [/home/ave/Pictures/vince.png, /home/ave/Pictures/avatar.png, /home/ave/Pictures/gallery/tokyo-rain-japan.png, /home/ave/Pictures/gallery/art.png, /home/ave/Pictures/gallery/rammstein.png, /home/ave/Pictures/gallery/globe.png, /home/ave/Pictures/hubble-anniversary-image.png, /home/ave/Pictures/dexter.png]
+11:13:09 DEBUG gallery.restful.controller.MainController: load 8 files
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: vince.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: avatar.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: tokyo-rain-japan.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: art.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: rammstein.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: globe.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: hubble-anniversary-image.png to upload-ROOT directory: upload-dir
+11:13:09 DEBUG gallery.restful.controller.MainController: copying file: dexter.png to upload-ROOT directory: upload-dir
+11:13:09 INFO  gallery.restful.controller.MainController: redirecting to gallery-page
+11:13:09 INFO  gallery.restful.controller.MainController: generating Spring HATEOAS links
+11:13:09 INFO  gallery.restful.controller.MainController: rendering gallery-page
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: vince.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: rammstein.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: art.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: tokyo-rain-japan.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: avatar.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: hubble-anniversary-image.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: dexter.png
+11:13:09 DEBUG gallery.restful.controller.MainController: loading resource by file name: globe.png
