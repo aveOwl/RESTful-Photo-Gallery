@@ -2,3 +2,5 @@
 test/
 target/
 RESTful-Photo-Gallery.iml
+upload-dir/
+logs/

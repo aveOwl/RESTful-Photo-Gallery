@@ -9,3 +9,4 @@
 
 **Reference**
 * [Thumbnail Gallery](http://blackrockdigital.github.io/startbootstrap-thumbnail-gallery/#)
+* [Spring File Upload](https://github.com/spring-guides/gs-uploading-files)

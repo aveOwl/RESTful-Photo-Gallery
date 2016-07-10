@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration debug="true">
+
+    <appender name="File" class="org.apache.log4j.FileAppender">
+        <param name="file" value="logs/main-logs.log"/>
+        <param name="append" value="false"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{HH:mm:ss} %-5p %c{4}: %m%n"/>
+        </layout>
+    </appender>
+
+    <logger name="com.gallery.restful" additivity="false">
+        <level value="debug"/>
+        <appender-ref ref="File"/>
+    </logger>
+
+    <root>
+        <priority value="info"/>
+        <appender-ref ref="Console"/>
+    </root>
+
+</log4j:configuration>
