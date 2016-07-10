@@ -1,6 +1,6 @@
 package com.gallery.restful;
 
-import com.gallery.restful.controller.MainController;
+import com.gallery.restful.controller.PhotoController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -20,27 +20,25 @@ public class SpringBootWebApplication implements CommandLineRunner {
     /**
      * Logging system.
      */
-    public static final Logger LOG = LoggerFactory.getLogger(SpringBootWebApplication.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SpringBootWebApplication.class);
 
     /**
      * Delegates to Spring Boot’s SpringApplication class by calling run.
-     * SpringApplication will bootstrap our application, starting Spring which
+     * SpringApplication will bootstrap application, starting Spring which
      * will in turn start the auto-configured Tomcat web server.
-     * @throws Exception
      * @param args command-line arguments
-     * @throws Exception if errors occur
      */
-    public static void main(final String[] args) throws Exception {
-        LOG.info("starting spring application");
+    public static void main(final String[] args) {
+        LOG.info("starting spring application ...");
         SpringApplication.run(SpringBootWebApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws Exception {
-        LOG.info("deleting ROOT directory");
-        FileSystemUtils.deleteRecursively(new File(MainController.ROOT));
+        LOG.info("removing server side upload folder ...");
+        FileSystemUtils.deleteRecursively(new File(PhotoController.ROOT));
 
-        LOG.info("creating new ROOT directory");
-        Files.createDirectory(Paths.get(MainController.ROOT));
+        LOG.info("creating server side upload folder ...");
+        Files.createDirectory(Paths.get(PhotoController.ROOT));
     }
 }

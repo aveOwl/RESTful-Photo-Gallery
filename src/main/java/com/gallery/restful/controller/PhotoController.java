@@ -1,9 +1,6 @@
 package com.gallery.restful.controller;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import com.gallery.restful.service.ScanDirectory;
+import com.gallery.restful.service.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,22 +16,21 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Controller is used to manage all incoming requests.
  */
 @Controller
 @EnableAutoConfiguration
-public class MainController {
+public class PhotoController {
 
     /**
      * Logging system.
      */
-    public static final Logger LOG = LoggerFactory.getLogger(MainController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PhotoController.class);
 
     /**
-     * Folder where upload files store.
+     * Server side folder where upload files store.
      */
     public static final String ROOT = "upload-dir";
 
@@ -48,7 +44,7 @@ public class MainController {
      * @param resourceLoader initialized.
      */
     @Autowired
-    public MainController(ResourceLoader resourceLoader) {
+    public PhotoController(ResourceLoader resourceLoader) {
         LOG.info("initializing resourceLoader");
         this.resourceLoader = resourceLoader;
     }
@@ -73,43 +69,36 @@ public class MainController {
         return "front-page";
     }
 
+    /**
+     * Retrieves files from server-ROOT folder, transports
+     * respective links to template.
+     * @param model to add attributes.
+     * @return view name.
+     */
     @RequestMapping(value = "/photo/gallery", method = RequestMethod.GET)
-    public String provideUploadInfo(Model model) throws IOException {
+    public String generateHATEOASLinks(Model model) {
 
-        LOG.info("generating Spring HATEOAS links");
-        model.addAttribute("files", Files.walk(Paths.get(ROOT))
-                .filter(path -> !path.equals(Paths.get(ROOT)))
-                .map(path -> Paths.get(ROOT).relativize(path))
-                .map(path -> linkTo(methodOn(MainController.class).getFile(path.toString())).withRel(path.toString()))
-                .collect(Collectors.toList()));
+        LOG.info("generating Spring HATEOAS links ...");
+
+        List<File> files = DirectoryScanner.search(ROOT);
+
+        model.addAttribute("links", DirectoryScanner.generateLinks(files));
 
         LOG.info("rendering gallery-page");
         return "gallery-page";
     }
 
-    @RequestMapping(value = "/photo/gallery/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<?> getFile(@PathVariable String filename) {
-        LOG.debug("loading resource by file name: {}", filename);
-        try {
-            return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
-        } catch (Exception e) {
-            LOG.error("failed to load resource by file name: {} with message: {}", filename, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     /**
      * Mapping for gallery page submit form.
-     * @param folderPath path to folder, which to provide photos.
+     * @param path path to folder, which to provide photos.
      * @return view name.
      */
     @RequestMapping(value = "/photo/gallery", method = RequestMethod.POST)
-    public final String addPhotos(@RequestParam("path") String folderPath,
+    public final String addPhotos(@RequestParam String path,
                                   RedirectAttributes redirectAttributes) {
         int k = 1;
-        LOG.debug("loading files from directory by given path: {}", folderPath);
-        List<File> files = ScanDirectory.findPNGFiles(folderPath);
+        LOG.debug("loading files from directory by given path: {}", path);
+        List<File> files = DirectoryScanner.search(path);
 
         if (files != null && files.size() > 0) {
             LOG.debug("load {} files", files.size());
@@ -130,5 +119,22 @@ public class MainController {
         redirectAttributes.addFlashAttribute("message", "Failed to upload because file was empty");
         LOG.info("redirecting to gallery-page");
         return "redirect:/photo/gallery";
+    }
+
+    /**
+     * Loads files from server-ROOT folder and generates response.
+     * @param filename name of the file to be fetched from resources.
+     * @return response with status 200 (OK) if no exception occur
+     * with status 404 (Not Found) otherwise.
+     */
+    @RequestMapping(value = "/photo/gallery/{filename:.+}")
+    public @ResponseBody ResponseEntity<?> loadFile(@PathVariable String filename) {
+        try {
+            LOG.debug("loading resource with name: {}", filename);
+            return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
+        } catch (Exception e) {
+            LOG.error("failed to load resource with name: {} error message: {}", filename, e.getMessage());
+            return ResponseEntity.notFound().build();
+        }
     }
 }

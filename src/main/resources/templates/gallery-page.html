@@ -18,10 +18,10 @@
             <h1 class="page-header text-info">Photo Gallery</h1>
         </div>
 
-        <div th:each="file : ${files}">
-            <div class="col-lg-3 col-md-4 col-xs-6 thumb">
-                <a th:href="${file.href}">
-                    <img th:src="${file.href}" alt="" height="200" width="200" />
+        <div th:each="link : ${links}">
+            <div class="col-lg-3">
+                <a th:href="${link.href}">
+                    <img th:src="${link.href}" th:alt="${link.rel}" height="200" width="200" />
                 </a>
             </div>
         </div>
