@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.*;
@@ -22,6 +22,7 @@ import java.util.List;
  */
 @Controller
 @EnableAutoConfiguration
+@RequestMapping("/photo")
 public class PhotoController {
 
     /**
@@ -50,54 +51,36 @@ public class PhotoController {
     }
 
     /**
-     * Redirecting from root path to front page.
-     * @return redirect link.
+     * Default front page.
+     * @return default front page model.
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public final String redirectingToFrontPage() {
-        LOG.info("redirecting from root path to main page");
-        return "redirect:/photo";
+    @RequestMapping(method = RequestMethod.GET)
+    public ModelAndView frontPage() {
+        LOG.info("rendering front page ...");
+        return getFrontModel();
     }
 
     /**
-     * Main page on GET request.
-     * @return view name.
+     * Default gallery page.
+     * @return gallery model with uploaded images.
      */
-    @RequestMapping(value = "/photo", method = RequestMethod.GET)
-    public final String viewFrontPage() {
-        LOG.info("rendering main page");
-        return "front-page";
+    @RequestMapping(value = "/gallery", method = RequestMethod.GET)
+    public ModelAndView generateLinks() {
+        LOG.info("rendering gallery page ...");
+        return getGalleryModel();
     }
 
     /**
-     * Retrieves files from server-ROOT folder, transports
-     * respective links to template.
-     * @param model to add attributes.
+     * Evaluates given input, searches through file system using
+     * provided path for files with ".png" extension, if any files
+     * found copies them on server and redirects to gallery page.
+     * @param path path to folder, which contains photos.
      * @return view name.
      */
-    @RequestMapping(value = "/photo/gallery", method = RequestMethod.GET)
-    public String generateHATEOASLinks(Model model) {
-
-        LOG.info("generating Spring HATEOAS links ...");
-
-        List<File> files = DirectoryScanner.search(ROOT);
-
-        model.addAttribute("links", DirectoryScanner.generateLinks(files));
-
-        LOG.info("rendering gallery-page");
-        return "gallery-page";
-    }
-
-    /**
-     * Mapping for gallery page submit form.
-     * @param path path to folder, which to provide photos.
-     * @return view name.
-     */
-    @RequestMapping(value = "/photo/gallery", method = RequestMethod.POST)
-    public String addPhotos(@RequestParam String path,
-                                  RedirectAttributes redirectAttributes) {
-        int k = 1;
+    @RequestMapping(method = RequestMethod.POST)
+    public String addPhotos(@RequestParam String path, RedirectAttributes redirectAttributes) {
         LOG.debug("loading files from directory by given path: {}", path);
+
         List<File> files = DirectoryScanner.search(path);
 
         if (files != null && files.size() > 0) {
@@ -105,15 +88,13 @@ public class PhotoController {
             try {
                 for (File file : files) {
                     InputStream inputStream = new FileInputStream(file);
-                    LOG.debug("copying file: {} to upload-ROOT directory: {}", file.getName(), ROOT);
+                    LOG.debug("copying file: {} to server directory: {}", file.getName(), ROOT);
                     Files.copy(inputStream, Paths.get(ROOT, file.getName()));
-                    redirectAttributes.addFlashAttribute("msg", k++ + " files uploaded");
+                    redirectAttributes.addFlashAttribute("msg", files.size() + " files uploaded");
                 }
             } catch (IOException|RuntimeException e) {
-                LOG.error("error while copying/reading file: {}, with message: {}",
-                        files.get(k).getName(), e.getMessage());
-                redirectAttributes.addFlashAttribute("msg", "Failed to upload " +
-                        files.get(k).getName() + " due to " + e.getMessage());
+                LOG.error("error while copying/reading file: {}", e.getMessage());
+                redirectAttributes.addFlashAttribute("msg", "Failed to upload files " + e.getMessage());
             }
         }
         redirectAttributes.addFlashAttribute("message", "Failed to upload because file was empty");
@@ -122,12 +103,12 @@ public class PhotoController {
     }
 
     /**
-     * Loads files from server-ROOT folder and generates response.
+     * Loads files from server and generates response.
      * @param filename name of the file to be fetched from resources.
      * @return response with status 200 (OK) if no exception occur
      * with status 404 (Not Found) otherwise.
      */
-    @RequestMapping(value = "/photo/gallery/picture/{filename:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/gallery/picture/{filename:.+}", method = RequestMethod.GET)
     public @ResponseBody ResponseEntity<?> loadFile(@PathVariable String filename) {
         try {
             LOG.debug("loading resource with name: {}", filename);
@@ -142,16 +123,52 @@ public class PhotoController {
      * Resizing each photo in gallery according to given parameters.
      * @param width width of the picture.
      * @param height heigth of the picture.
-     * @param redirectAttributes width and height on to the gallery page.
-     * @return view name.
+     * @return gallery view with resized images.
      */
-    @RequestMapping(value = "/photo/gallery/wh/{width}x{height}", method = RequestMethod.GET)
-    public String resize(@PathVariable String width, @PathVariable String height,
-                         RedirectAttributes redirectAttributes) {
-        LOG.debug("setting photo size: {} x {}", width, height);
-        redirectAttributes.addFlashAttribute("width", width);
-        redirectAttributes.addFlashAttribute("height", height);
+    @RequestMapping(value = "/gallery/wh/{width}x{height}", method = RequestMethod.GET)
+    public ModelAndView resize(@PathVariable String width, @PathVariable String height) {
+        ModelAndView model = getGalleryModel();
 
-        return "redirect:/photo/gallery";
+        model.addObject("width", width);
+        model.addObject("height", height);
+        LOG.debug("setting photo size: {} x {}", width, height);
+
+        return model;
+    }
+
+    /**
+     * Changing gallery theme.
+     * @return gallery view with dark theme.
+     */
+    @RequestMapping(value = "/gallery/darkbackground", method = RequestMethod.GET)
+    public ModelAndView blackGallery() {
+        ModelAndView model = getGalleryModel();
+
+        model.addObject("isDark", true);
+
+        return model;
+    }
+
+    /**
+     * Default model for building gallery page.
+     * @return default view of gallery page.
+     */
+    private ModelAndView getGalleryModel() {
+        ModelAndView model = new ModelAndView("index");
+        model.addObject("gallery", true);
+        model.addObject("links", DirectoryScanner.generateLinks(ROOT));
+
+        return model;
+    }
+
+    /**
+     * Default model for building front page.
+     * @return default view of front page.
+     */
+    private ModelAndView getFrontModel() {
+        ModelAndView model = new ModelAndView("index");
+        model.addObject("front", true);
+
+        return model;
     }
 }
