@@ -94,7 +94,7 @@ public class PhotoController {
      * @return view name.
      */
     @RequestMapping(value = "/photo/gallery", method = RequestMethod.POST)
-    public final String addPhotos(@RequestParam String path,
+    public String addPhotos(@RequestParam String path,
                                   RedirectAttributes redirectAttributes) {
         int k = 1;
         LOG.debug("loading files from directory by given path: {}", path);
@@ -127,7 +127,7 @@ public class PhotoController {
      * @return response with status 200 (OK) if no exception occur
      * with status 404 (Not Found) otherwise.
      */
-    @RequestMapping(value = "/photo/gallery/{filename:.+}")
+    @RequestMapping(value = "/photo/gallery/picture/{filename:.+}", method = RequestMethod.GET)
     public @ResponseBody ResponseEntity<?> loadFile(@PathVariable String filename) {
         try {
             LOG.debug("loading resource with name: {}", filename);
@@ -136,5 +136,22 @@ public class PhotoController {
             LOG.error("failed to load resource with name: {} error message: {}", filename, e.getMessage());
             return ResponseEntity.notFound().build();
         }
+    }
+
+    /**
+     * Resizing each photo in gallery according to given parameters.
+     * @param width width of the picture.
+     * @param height heigth of the picture.
+     * @param redirectAttributes width and height on to the gallery page.
+     * @return view name.
+     */
+    @RequestMapping(value = "/photo/gallery/wh/{width}x{height}", method = RequestMethod.GET)
+    public String resize(@PathVariable String width, @PathVariable String height,
+                         RedirectAttributes redirectAttributes) {
+        LOG.debug("setting photo size: {} x {}", width, height);
+        redirectAttributes.addFlashAttribute("width", width);
+        redirectAttributes.addFlashAttribute("height", height);
+
+        return "redirect:/photo/gallery";
     }
 }

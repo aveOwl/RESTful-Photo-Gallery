@@ -1,5 +1,8 @@
 package com.gallery.restful.service;
 
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+
 import com.gallery.restful.controller.PhotoController;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -10,9 +13,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Provides directory scan to find any files.

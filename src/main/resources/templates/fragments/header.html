@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<nav class="navbar navbar-inverse" th:fragment="header">
+
+<nav class="navbar navbar-fixed-top navbar-inverse"
+     role="navigation" th:fragment="header">
+
     <div class="container">
         <div class="navbar-header">
             <a class="navbar-brand" th:href="@{/photo}">Photo Gallery</a>
         </div>
-        <div id="navbar">
+        <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li class="active"><a th:href="@{/photo}">Home</a></li>
             </ul>
@@ -14,7 +17,10 @@
                 <li><a th:href="@{/photo/gallery}">My Photos</a></li>
             </ul>
         </div>
+        <!-- /.navbar-collapse -->
     </div>
+    <!-- /.container -->
 </nav>
+
 </body>
 </html>

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Gallery</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
           href="../static/css/bootstrap.min.css" />
 </head>
@@ -19,9 +19,10 @@
         </div>
 
         <div th:each="link : ${links}">
-            <div class="col-lg-3">
-                <a th:href="${link.href}">
-                    <img th:src="${link.href}" th:alt="${link.rel}" height="200" width="200" />
+            <div class="col-md-3">
+                <a class="thumbnail" th:href="${link.href}">
+                    <img th:src="${link.href}" th:alt="${link.rel}"
+                         th:width="${width == null ? '200' : width}" th:height="${height == null ? '200': height}" />
                 </a>
             </div>
         </div>
@@ -31,9 +32,12 @@
         </div>
 
     </div>
+
+    <!-- /.row-->
+    <hr />
+    <div th:replace="fragments/footer :: footer"></div>
+    <!-- ./footer-->
 </div>
-
-<div th:replace="fragments/footer :: footer"></div>
-
+<!-- /.container -->
 </body>
 </html>
