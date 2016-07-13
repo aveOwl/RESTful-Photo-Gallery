@@ -5,12 +5,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
           href="../static/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/horizontal.css}"
+          href="../static/css/horizontal.css" />
 </head>
 <body th:style="${isDark} ? 'background-color:#282828' : 'background-color:#ffffff'">
 
 <div th:replace="fragments/header :: header"></div>
 
-<div class="container" th:if="${front}">
+<div class="container" th:if="${home}">
 
     <div class="row">
 
@@ -47,12 +49,14 @@
             <h1 class="page-header text-info">Photo Gallery</h1>
         </div>
 
-        <div th:each="link : ${links}">
-            <div class="col-md-3">
-                <a class="thumbnail" th:href="${link.href}">
-                    <img th:src="${link.href}" th:alt="${link.rel}"
-                         th:width="${width == null ? '200' : width}" th:height="${height == null ? '200': height}" />
-                </a>
+        <div class="container cover-container">
+            <div>
+                <div class="cover-item" th:each="link : ${links}">
+                    <a th:href="${link.href}">
+                        <img th:src="${link.href}" th:alt="${link.rel}"
+                             th:width="${width}" th:height="${height}" />
+                    </a>
+                </div>
             </div>
         </div>
 

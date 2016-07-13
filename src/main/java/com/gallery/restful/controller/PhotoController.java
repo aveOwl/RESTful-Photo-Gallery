@@ -17,12 +17,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.gallery.restful.navigation.Points.*;
+
 /**
  * Controller is used to manage all incoming requests.
  */
 @Controller
 @EnableAutoConfiguration
-@RequestMapping("/photo")
 public class PhotoController {
 
     /**
@@ -34,6 +35,16 @@ public class PhotoController {
      * Server side folder where upload files store.
      */
     public static final String ROOT = "upload-dir";
+
+    /**
+     * Default picture resolution.
+     */
+    private static final int DEFAULT_SIZE = 200;
+
+    /**
+     * Number of pictures in one row.
+     */
+    private static final int DEFAULT_LAYOUT = 4;
 
     /**
      * Loading resources for classpath.
@@ -51,10 +62,19 @@ public class PhotoController {
     }
 
     /**
-     * Default front page.
-     * @return default front page model.
+     * Redirecting from root path to home page.
+     * @return redirect to home page.
      */
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String root() {
+        return "redirect:" + HOME;
+    }
+
+    /**
+     * Default home page.
+     * @return default home page model.
+     */
+    @RequestMapping(value = HOME, method = RequestMethod.GET)
     public ModelAndView frontPage() {
         LOG.info("rendering front page ...");
         return getFrontModel();
@@ -64,7 +84,7 @@ public class PhotoController {
      * Default gallery page.
      * @return gallery model with uploaded images.
      */
-    @RequestMapping(value = "/gallery", method = RequestMethod.GET)
+    @RequestMapping(value = GALLERY, method = RequestMethod.GET)
     public ModelAndView generateLinks() {
         LOG.info("rendering gallery page ...");
         return getGalleryModel();
@@ -77,7 +97,7 @@ public class PhotoController {
      * @param path path to folder, which contains photos.
      * @return view name.
      */
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = HOME, method = RequestMethod.POST)
     public String addPhotos(@RequestParam String path, RedirectAttributes redirectAttributes) {
         LOG.debug("loading files from directory by given path: {}", path);
 
@@ -108,7 +128,7 @@ public class PhotoController {
      * @return response with status 200 (OK) if no exception occur
      * with status 404 (Not Found) otherwise.
      */
-    @RequestMapping(value = "/gallery/picture/{filename:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = SINGLE_PICTURE, method = RequestMethod.GET)
     public @ResponseBody ResponseEntity<?> loadFile(@PathVariable String filename) {
         try {
             LOG.debug("loading resource with name: {}", filename);
@@ -125,7 +145,7 @@ public class PhotoController {
      * @param height heigth of the picture.
      * @return gallery view with resized images.
      */
-    @RequestMapping(value = "/gallery/wh/{width}x{height}", method = RequestMethod.GET)
+    @RequestMapping(value = CUSTOM_RESOLUTION, method = RequestMethod.GET)
     public ModelAndView resize(@PathVariable String width, @PathVariable String height) {
         ModelAndView model = getGalleryModel();
 
@@ -140,7 +160,7 @@ public class PhotoController {
      * Changing gallery theme.
      * @return gallery view with dark theme.
      */
-    @RequestMapping(value = "/gallery/darkbackground", method = RequestMethod.GET)
+    @RequestMapping(value = DARK_THEME, method = RequestMethod.GET)
     public ModelAndView blackGallery() {
         ModelAndView model = getGalleryModel();
 
@@ -155,19 +175,23 @@ public class PhotoController {
      */
     private ModelAndView getGalleryModel() {
         ModelAndView model = new ModelAndView("index");
+
         model.addObject("gallery", true);
         model.addObject("links", DirectoryScanner.generateLinks(ROOT));
+        model.addObject("width", DEFAULT_SIZE);
+        model.addObject("height", DEFAULT_SIZE);
+        model.addObject("picturesInRow", DEFAULT_LAYOUT);
 
         return model;
     }
 
     /**
-     * Default model for building front page.
-     * @return default view of front page.
+     * Default model for building home page.
+     * @return default view of home page.
      */
     private ModelAndView getFrontModel() {
         ModelAndView model = new ModelAndView("index");
-        model.addObject("front", true);
+        model.addObject("home", true);
 
         return model;
     }
