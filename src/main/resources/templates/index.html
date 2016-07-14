@@ -53,8 +53,15 @@
             <div>
                 <div class="cover-item" th:each="link : ${links}">
                     <a th:href="${link.href}">
-                        <img th:src="${link.href}" th:alt="${link.rel}"
-                             th:width="${width}" th:height="${height}" />
+                        <img th:unless="${isOriginal}"
+                             th:src="${link.href}"
+                             th:alt="${link.rel}"
+                             th:width="${width}"
+                             th:height="${height}" />
+
+                        <img th:if="${isOriginal}"
+                             th:src="${link.href}"
+                             th:alt="${link.rel}" />
                     </a>
                 </div>
             </div>

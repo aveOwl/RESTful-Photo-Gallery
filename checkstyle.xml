@@ -4,28 +4,28 @@
         "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 
 <!--
-  Checkstyle configuration that checks the sun coding conventions from:
-    - the Java Language Specification at
-      http://java.sun.com/docs/books/jls/second_edition/html/index.html
-    - the Sun Code Conventions at http://java.sun.com/docs/codeconv/
-    - the Javadoc guidelines at
-      http://java.sun.com/j2se/javadoc/writingdoccomments/index.html
-    - the JDK Api documentation http://java.sun.com/j2se/docs/api/index.html
-    - some best practices
-  Checkstyle is very configurable. Be sure to read the documentation at
-  http://checkstyle.sf.net (or in your downloaded distribution).
-  Most Checks are configurable, be sure to consult the documentation.
-  To completely disable a check, just comment it out or delete it from the file.
-  Finally, it is worth reading the documentation.
--->
+          Checkstyle configuration that checks the sun coding conventions from:
+            - the Java Language Specification at
+              http://java.sun.com/docs/books/jls/second_edition/html/index.html
+            - the Sun Code Conventions at http://java.sun.com/docs/codeconv/
+            - the Javadoc guidelines at
+              http://java.sun.com/j2se/javadoc/writingdoccomments/index.html
+            - the JDK Api documentation http://java.sun.com/j2se/docs/api/index.html
+            - some best practices
+          Checkstyle is very configurable. Be sure to read the documentation at
+          http://checkstyle.sf.net (or in your downloaded distribution).
+          Most Checks are configurable, be sure to consult the documentation.
+          To completely disable a check, just comment it out or delete it from the file.
+          Finally, it is worth reading the documentation.
+        -->
 
 <module name="Checker">
     <!--
-        If you set the basedir property below, then all reported file
-        names will be relative to the specified directory. See
-        http://checkstyle.sourceforge.net/5.x/config.html#Checker
-        <property name="basedir" value="${basedir}"/>
-    -->
+                If you set the basedir property below, then all reported file
+                names will be relative to the specified directory. See
+                http://checkstyle.sourceforge.net/5.x/config.html#Checker
+                <property name="basedir" value="${basedir}"/>
+            -->
 
     <!-- Checks whether files end with a new line.                        -->
     <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -98,7 +98,6 @@
         <module name="AvoidStarImport"/>
         <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
-        <module name="UnusedImports"/>
 
 
         <!-- Checks for Size Violations.                    -->
@@ -144,7 +143,7 @@
         <module name="AvoidInlineConditionals"/>
         <module name="EmptyStatement"/>
         <module name="EqualsHashCode"/>
-        <module name="HiddenField"/>
+        <!--<module name="HiddenField" />-->
         <module name="IllegalInstantiation"/>
         <module name="InnerAssignment"/>
         <module name="MagicNumber"/>
@@ -154,7 +153,7 @@
 
         <!-- Checks for class design                         -->
         <!-- See http://checkstyle.sf.net/config_design.html -->
-        <!--<module name="DesignForExtension"/>-->
+        <!-- module name="DesignForExtension"/ -->
         <module name="FinalClass"/>
         <!--<module name="HideUtilityClassConstructor"/>-->
         <module name="InterfaceIsType"/>
@@ -164,7 +163,7 @@
         <!-- Miscellaneous other checks.                   -->
         <!-- See http://checkstyle.sf.net/config_misc.html -->
         <module name="ArrayTypeStyle"/>
-        <module name="FinalParameters"/>
+        <!--<module name="FinalParameters"/>-->
         <module name="TodoComment"/>
         <module name="UpperEll"/>
 

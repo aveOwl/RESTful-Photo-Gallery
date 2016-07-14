@@ -8,16 +8,28 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static com.gallery.restful.navigation.Points.*;
+import static com.gallery.restful.navigation.Points.ORIGINAL;
+import static com.gallery.restful.navigation.Points.HOME;
+import static com.gallery.restful.navigation.Points.GALLERY;
+import static com.gallery.restful.navigation.Points.SINGLE_PICTURE;
+import static com.gallery.restful.navigation.Points.CUSTOM_RESOLUTION;
+import static com.gallery.restful.navigation.Points.DARK_THEME;
 
 /**
  * Controller is used to manage all incoming requests.
@@ -40,11 +52,6 @@ public class PhotoController {
      * Default picture resolution.
      */
     private static final int DEFAULT_SIZE = 200;
-
-    /**
-     * Number of pictures in one row.
-     */
-    private static final int DEFAULT_LAYOUT = 4;
 
     /**
      * Loading resources for classpath.
@@ -95,6 +102,7 @@ public class PhotoController {
      * provided path for files with ".png" extension, if any files
      * found copies them on server and redirects to gallery page.
      * @param path path to folder, which contains photos.
+     * @param redirectAttributes attributes that a redirected to gallery page.
      * @return view name.
      */
     @RequestMapping(value = HOME, method = RequestMethod.POST)
@@ -112,9 +120,9 @@ public class PhotoController {
                     Files.copy(inputStream, Paths.get(ROOT, file.getName()));
                     redirectAttributes.addFlashAttribute("msg", files.size() + " files uploaded");
                 }
-            } catch (IOException|RuntimeException e) {
-                LOG.error("error while copying/reading file: {}", e.getMessage());
+            } catch (IOException | RuntimeException e) {
                 redirectAttributes.addFlashAttribute("msg", "Failed to upload files " + e.getMessage());
+                LOG.error("error while copying/reading file: {}", e.getMessage());
             }
         }
         redirectAttributes.addFlashAttribute("message", "Failed to upload because file was empty");
@@ -161,10 +169,25 @@ public class PhotoController {
      * @return gallery view with dark theme.
      */
     @RequestMapping(value = DARK_THEME, method = RequestMethod.GET)
-    public ModelAndView blackGallery() {
+    public ModelAndView makeDark() {
         ModelAndView model = getGalleryModel();
 
+        LOG.trace("changing to dark theme ...");
         model.addObject("isDark", true);
+
+        return model;
+    }
+
+    /**
+     * Displaying every image with its original size.
+     * @return gallery view with images in original resolution.
+     */
+    @RequestMapping(value = ORIGINAL, method = RequestMethod.GET)
+    public ModelAndView showOriginal() {
+        ModelAndView model = getGalleryModel();
+
+        LOG.trace("resizing photos to its original resolution ...");
+        model.addObject("isOriginal", true);
 
         return model;
     }
@@ -180,7 +203,6 @@ public class PhotoController {
         model.addObject("links", DirectoryScanner.generateLinks(ROOT));
         model.addObject("width", DEFAULT_SIZE);
         model.addObject("height", DEFAULT_SIZE);
-        model.addObject("picturesInRow", DEFAULT_LAYOUT);
 
         return model;
     }

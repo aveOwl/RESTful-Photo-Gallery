@@ -27,12 +27,12 @@ public class DirectoryScanner {
     /**
      * Files extensions to be searched.
      */
-    private static final String[] EXTENSIONS = new String[] { "png" };
+    private static final String[] EXTENSIONS = new String[] {"png"};
 
     /**
      * List of found files.
      */
-    private static List<File> LIST_OF_FILES = new ArrayList<>();
+    private static List<File> listOfFiles = new ArrayList<>();
 
     /**
      * Searches through given directory and subdirectories
@@ -45,10 +45,10 @@ public class DirectoryScanner {
 
         File directory = new File(path);
 
-        LIST_OF_FILES = (List<File>) FileUtils.listFiles(directory, EXTENSIONS, true);
+        listOfFiles = (List<File>) FileUtils.listFiles(directory, EXTENSIONS, true);
 
-        LOG.debug("in folder: {} found {} files", path, LIST_OF_FILES.size());
-        return LIST_OF_FILES;
+        LOG.debug("in folder: {} found {} files", path, listOfFiles.size());
+        return listOfFiles;
     }
 
     /**
@@ -61,11 +61,11 @@ public class DirectoryScanner {
         Link link;
         List<Link> links = new ArrayList<>();
 
-        LIST_OF_FILES = search(path);
+        listOfFiles = search(path);
 
         LOG.info("generating HATEOAS images links ...");
 
-        for (File file : LIST_OF_FILES) {
+        for (File file : listOfFiles) {
             link = linkTo(methodOn(PhotoController.class)
                     .loadFile(file.getName()))
                     .withRel(file.getName());
