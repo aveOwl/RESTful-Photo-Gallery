@@ -1,9 +1,11 @@
 package com.gallery.restful.controller;
 
-import com.gallery.restful.service.DirectoryScanner;
+import com.gallery.restful.service.PhotoService;
+import com.gallery.restful.util.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
@@ -54,18 +56,24 @@ public class PhotoController {
     private static final int DEFAULT_SIZE = 200;
 
     /**
-     * Loading resources for classpath.
+     * Classpath resource loader.
      */
     private final ResourceLoader resourceLoader;
 
     /**
-     * Initializing resourceLoader.
-     * @param resourceLoader initialized.
+     * Photo service {@link PhotoService}.
+     */
+    private final PhotoService photoService;
+
+    /**
+     * Injecting dependencies.
+     * @param resourceLoader to be injected.
+     * @param photoService to be injected.
      */
     @Autowired
-    public PhotoController(ResourceLoader resourceLoader) {
-        LOG.info("initializing resourceLoader");
+    public PhotoController(ResourceLoader resourceLoader, PhotoService photoService) {
         this.resourceLoader = resourceLoader;
+        this.photoService = photoService;
     }
 
     /**
@@ -84,7 +92,7 @@ public class PhotoController {
     @RequestMapping(value = HOME, method = RequestMethod.GET)
     public ModelAndView frontPage() {
         LOG.info("rendering front page ...");
-        return getFrontModel();
+        return getHomeModel();
     }
 
     /**
@@ -102,32 +110,14 @@ public class PhotoController {
      * provided path for files with ".png" extension, if any files
      * found copies them on server and redirects to gallery page.
      * @param path path to folder, which contains photos.
-     * @param redirectAttributes attributes that a redirected to gallery page.
      * @return view name.
      */
     @RequestMapping(value = HOME, method = RequestMethod.POST)
-    public String addPhotos(@RequestParam String path, RedirectAttributes redirectAttributes) {
-        LOG.debug("loading files from directory by given path: {}", path);
+    public String addPhotos(@RequestParam String path) {
+        photoService.copyAll(path);
 
-        List<File> files = DirectoryScanner.search(path);
-
-        if (files != null && files.size() > 0) {
-            LOG.debug("load {} files", files.size());
-            try {
-                for (File file : files) {
-                    InputStream inputStream = new FileInputStream(file);
-                    LOG.debug("copying file: {} to server directory: {}", file.getName(), ROOT);
-                    Files.copy(inputStream, Paths.get(ROOT, file.getName()));
-                    redirectAttributes.addFlashAttribute("msg", files.size() + " files uploaded");
-                }
-            } catch (IOException | RuntimeException e) {
-                redirectAttributes.addFlashAttribute("msg", "Failed to upload files " + e.getMessage());
-                LOG.error("error while copying/reading file: {}", e.getMessage());
-            }
-        }
-        redirectAttributes.addFlashAttribute("message", "Failed to upload because file was empty");
         LOG.info("redirecting to gallery-page");
-        return "redirect:/photo/gallery";
+        return "redirect:" + GALLERY;
     }
 
     /**
@@ -137,7 +127,8 @@ public class PhotoController {
      * with status 404 (Not Found) otherwise.
      */
     @RequestMapping(value = SINGLE_PICTURE, method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity<?> loadFile(@PathVariable String filename) {
+    @ResponseBody
+    public ResponseEntity<?> loadFile(@PathVariable String filename) {
         try {
             LOG.debug("loading resource with name: {}", filename);
             return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
@@ -211,7 +202,7 @@ public class PhotoController {
      * Default model for building home page.
      * @return default view of home page.
      */
-    private ModelAndView getFrontModel() {
+    private ModelAndView getHomeModel() {
         ModelAndView model = new ModelAndView("index");
         model.addObject("home", true);
 

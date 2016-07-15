@@ -1,4 +1,4 @@
-package com.gallery.restful.service;
+package com.gallery.restful.util;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
