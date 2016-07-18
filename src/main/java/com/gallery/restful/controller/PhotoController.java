@@ -5,7 +5,6 @@ import com.gallery.restful.util.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.ResponseEntity;
@@ -16,25 +15,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.List;
 
-import static com.gallery.restful.navigation.Points.ORIGINAL;
-import static com.gallery.restful.navigation.Points.HOME;
-import static com.gallery.restful.navigation.Points.GALLERY;
-import static com.gallery.restful.navigation.Points.SINGLE_PICTURE;
 import static com.gallery.restful.navigation.Points.CUSTOM_RESOLUTION;
 import static com.gallery.restful.navigation.Points.DARK_THEME;
+import static com.gallery.restful.navigation.Points.GALLERY;
+import static com.gallery.restful.navigation.Points.HOME;
+import static com.gallery.restful.navigation.Points.ORIGINAL;
+import static com.gallery.restful.navigation.Points.SINGLE_PICTURE;
 
 /**
- * Controller is used to manage all incoming requests.
+ * Controller is used to manage all
+ * incoming requests.
  */
 @Controller
 @EnableAutoConfiguration
@@ -46,7 +39,8 @@ public class PhotoController {
     private static final Logger LOG = LoggerFactory.getLogger(PhotoController.class);
 
     /**
-     * Server side folder where upload files store.
+     * Server side folder where upload
+	 * files store.
      */
     public static final String ROOT = "upload-dir";
 
@@ -81,7 +75,7 @@ public class PhotoController {
      * @return redirect to home page.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String root() {
+    public String redirect() {
         return "redirect:" + HOME;
     }
 
@@ -90,7 +84,7 @@ public class PhotoController {
      * @return default home page model.
      */
     @RequestMapping(value = HOME, method = RequestMethod.GET)
-    public ModelAndView frontPage() {
+    public ModelAndView showFrontPage() {
         LOG.info("rendering front page ...");
         return getHomeModel();
     }
@@ -160,7 +154,7 @@ public class PhotoController {
      * @return gallery view with dark theme.
      */
     @RequestMapping(value = DARK_THEME, method = RequestMethod.GET)
-    public ModelAndView makeDark() {
+    public ModelAndView showDark() {
         ModelAndView model = getGalleryModel();
 
         LOG.trace("changing to dark theme ...");

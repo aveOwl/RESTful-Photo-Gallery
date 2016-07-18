@@ -6,7 +6,7 @@ import com.gallery.restful.controller.PhotoController;
  * Defines constants to describe url's for
  * {@link PhotoController}.
  */
-public abstract class Points {
+public class Points {
     /**
      * Prevents instantiation of the class.
      */
@@ -38,7 +38,8 @@ public abstract class Points {
     public static final String DARK_THEME = GALLERY + "/darkbackground";
 
     /**
-     * URL path to gallery page with photos in original resolution.
+     * URL path to gallery page with photos
+     * in original resolution.
      */
     public static final String ORIGINAL = GALLERY + "/original";
 }

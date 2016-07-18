@@ -1,42 +1,43 @@
 package com.gallery.restful.controller;
 
 import com.gallery.restful.service.PhotoService;
-import com.gallery.restful.util.DirectoryScanner;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import static com.gallery.restful.navigation.Points.*;
-import static org.mockito.BDDMockito.given;
+import static com.gallery.restful.navigation.Points.DARK_THEME;
+import static com.gallery.restful.navigation.Points.GALLERY;
+import static com.gallery.restful.navigation.Points.HOME;
+import static com.gallery.restful.navigation.Points.ORIGINAL;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 /**
- * {@code @WebMvcTest} based tests for {@link PhotoController}.
+ * {@code @WebMvcTest} based tests
+ * for {@link PhotoController}.
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(PhotoController.class)
 public class PhotoControllerTest {
 
     /**
-     * Main entry point for server-side Spring MVC test support.
+     * Main entry point for server-side
+     * Spring MVC test support.
      */
     @Autowired
     private MockMvc mvc;
@@ -48,27 +49,29 @@ public class PhotoControllerTest {
     private PhotoService photoService;
 
     /**
-     * Creating and deleting temporary folder structure.
+     * Creating and deleting temporary folder
+     * structure.
      */
     @Rule
-    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     /**
-     * Testing proper redirection to home page, when
-     * root path is used.
+     * Redirection from root path onto home
+     * page.
      */
     @Test
-    public void getRedirectedToHomePage() throws Exception {
+    public void shouldRedirectToHomePage() throws Exception {
         this.mvc.perform(get("/"))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(HOME));
     }
 
     /**
-     * Testing default home page view, when accessed with GET request.
+     * Displaying default home page view,
+     * when accessed with GET request.
      */
     @Test
-    public void getHomeDefaultModelWithGETRequest() throws Exception {
+    public void shouldDisplayHomePage() throws Exception {
         this.mvc.perform(get(HOME))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/html;charset=UTF-8"))
@@ -76,10 +79,12 @@ public class PhotoControllerTest {
     }
 
     /**
-     * Testing default gallery page view, without any pictures.
+     * Displaying default gallery page view,
+     * when accessed with GET request, without
+     * any uploaded pictures.
      */
     @Test
-    public void getGalleryDefaultModelWithGETRequest() throws Exception {
+    public void shouldDisplayEmptyGalleryPage() throws Exception {
         this.mvc.perform(get(GALLERY))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("text/html;charset=UTF-8"))
@@ -91,11 +96,13 @@ public class PhotoControllerTest {
     }
 
     /**
-     * Testing redirection from home page proceeding POST request
-     * in order to upload files to gallery page.
+     * Copying files from given path on server.
+     * Redirecting from home page proceeding
+     * POST request onto gallery page.
+     * Display uploaded pictures.
      */
     @Test
-    public void getRedirectedFromHomePostRequestToGalleryPage() throws Exception {
+    public void shouldDisplayGalleryPageWithUploadedPictures() throws Exception {
         String folderPath = temporaryFolder.newFolder().getAbsolutePath();
 
         this.mvc.perform(post(HOME).param("path", folderPath))
@@ -105,19 +112,20 @@ public class PhotoControllerTest {
     }
 
     /**
-     * Testing dark theme.
+     * Applying dark theme for gallery page.
      */
     @Test
-    public void getDarkThemeGalleryGETRequest() throws Exception {
+    public void shouldApplyDarkThemeForGalleryPage() throws Exception {
         this.mvc.perform(get(DARK_THEME))
                 .andExpect(model().attribute("isDark", true));
     }
 
     /**
-     * Testing original sized pictures property.
+     * Displaying gallery page with pictures
+     * in original resolution.
      */
     @Test
-    public void getOriginalSizedPicturesGalleryGETRequest() throws Exception {
+    public void shouldApplyOriginalResolutionOnPictures() throws Exception {
         this.mvc.perform(get(ORIGINAL))
                 .andExpect(model().attribute("isOriginal", true));
     }

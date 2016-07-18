@@ -1,4 +1,7 @@
 # RESTful-Photo-Gallery
+![](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery.svg?branch=master)
+![](https://coveralls.io/repos/github/aveOwl/RESTful-Photo-Gallery/badge.svg?branch=master)
+
 **Technologies involved**
 * [Maven](https://maven.apache.org/)
 * [Maven Jacoco Plugin](http://www.eclemma.org/jacoco/trunk/doc/maven.html)

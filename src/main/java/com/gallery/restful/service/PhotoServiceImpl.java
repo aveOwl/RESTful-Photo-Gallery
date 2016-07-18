@@ -1,6 +1,5 @@
 package com.gallery.restful.service;
 
-import com.gallery.restful.controller.PhotoController;
 import com.gallery.restful.util.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,7 @@ public class PhotoServiceImpl implements PhotoService {
 
         List<File> files = DirectoryScanner.search(path);
 
-        if (files != null && files.size() > 0) {
+        if (files != null && !files.isEmpty()) {
             LOG.debug("load {} files", files.size());
             try {
                 for (File file : files) {

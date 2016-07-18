@@ -1,7 +1,7 @@
 package com.gallery.restful.service;
 
 /**
- * A service to manage photo upload/deletion.
+ * A service to manage photo upload.
  */
 public interface PhotoService {
 

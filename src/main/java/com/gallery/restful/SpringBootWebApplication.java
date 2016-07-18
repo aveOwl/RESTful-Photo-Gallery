@@ -33,6 +33,12 @@ public class SpringBootWebApplication implements CommandLineRunner {
         SpringApplication.run(SpringBootWebApplication.class, args);
     }
 
+    /**
+     * When spring application starts removes existing
+     * server folder and creates new one.
+     * @param args command line arguments.
+     * @throws Exception on error.
+     */
     @Override
     public void run(String... args) throws Exception {
         LOG.info("removing server side upload folder ...");
