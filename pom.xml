@@ -17,7 +17,6 @@
     <name>Photo Gallery</name>
 
     <properties>
-        <project.build.finalName>PhotoGallery</project.build.finalName>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <thymeleaf.version>2.1.2.RELEASE</thymeleaf.version>
         <commons.version>2.4</commons.version>
@@ -39,7 +38,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -75,7 +73,7 @@
     </dependencies>
 
     <build>
-        <finalName>${project.build.finalName}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -153,6 +151,24 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.4.11</version>
+                <configuration>
+                    <imageName>aveowl/rest-gallery</imageName>
+                    <baseImage>java:8</baseImage>
+                    <entryPoint>["java", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+                    <!-- copy the service's jar file from target into the root directory of the image -->
+                    <resources>
+                        <resource>
+                            <targetPath>/</targetPath>
+                            <directory>${project.build.directory}</directory>
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

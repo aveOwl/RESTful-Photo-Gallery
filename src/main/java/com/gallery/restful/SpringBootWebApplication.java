@@ -12,6 +12,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static com.gallery.restful.controller.PhotoController.*;
+
 /**
  * Launches spring application.
  */
@@ -42,9 +44,9 @@ public class SpringBootWebApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         LOG.info("removing server side upload folder ...");
-        FileSystemUtils.deleteRecursively(new File(PhotoController.ROOT));
+        FileSystemUtils.deleteRecursively(new File(ROOT));
 
         LOG.info("creating server side upload folder ...");
-        Files.createDirectory(Paths.get(PhotoController.ROOT));
+        Files.createDirectory(Paths.get(ROOT));
     }
 }
