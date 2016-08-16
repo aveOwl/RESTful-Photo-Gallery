@@ -1,12 +1,12 @@
-package com.gallery.restful.controller;
+package com.gallery.controller;
 
-import com.gallery.restful.service.PhotoService;
-import com.gallery.restful.util.DirectoryScanner;
+import com.gallery.service.PhotoService;
+import com.gallery.util.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,21 +17,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.nio.file.Paths;
-
-import static com.gallery.restful.navigation.Points.CUSTOM_RESOLUTION;
-import static com.gallery.restful.navigation.Points.DARK_THEME;
-import static com.gallery.restful.navigation.Points.GALLERY;
-import static com.gallery.restful.navigation.Points.HOME;
-import static com.gallery.restful.navigation.Points.ORIGINAL;
-import static com.gallery.restful.navigation.Points.SINGLE_PICTURE;
+import java.util.List;
 
 /**
- * Controller is used to manage all
- * incoming requests.
+ * The PhotoController is a RESTful web service controller.
  */
 @Controller
-@EnableAutoConfiguration
-public class PhotoController {
+public class PhotoController extends BaseController {
 
     /**
      * Logging system.
@@ -40,7 +32,7 @@ public class PhotoController {
 
     /**
      * Server side folder where upload
-	 * files store.
+     * files store.
      */
     public static final String ROOT = "upload-dir";
 
@@ -71,107 +63,111 @@ public class PhotoController {
     }
 
     /**
-     * Redirecting from root path to home page.
-     * @return redirect to home page.
+     * Redirecting root path to home page.
+     * @return redirection to home page.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public String redirect() {
-        return "redirect:" + HOME;
+        return "redirect:/photo";
     }
 
     /**
      * Default home page.
-     * @return default home page model.
+     * @return home model.
      */
-    @RequestMapping(value = HOME, method = RequestMethod.GET)
-    public ModelAndView showFrontPage() {
-        LOG.info("rendering front page ...");
+    @RequestMapping(value = "/photo", method = RequestMethod.GET)
+    public ModelAndView home() {
+        LOG.info("Rendering home page...");
         return getHomeModel();
     }
 
     /**
-     * Default gallery page.
-     * @return gallery model with uploaded images.
+     * Using provided path copies all files on to the server.
+     * @param path path to folder, which contains photos.
+     * @return redirection to gallery page.
      */
-    @RequestMapping(value = GALLERY, method = RequestMethod.GET)
+    @RequestMapping(value = "/photo", method = RequestMethod.POST)
+    public String addPictures(@RequestParam String path) {
+
+        photoService.copyAll(path);
+
+        LOG.info("Redirecting to gallery-page...");
+        return "redirect:/photo/gallery";
+    }
+
+    /**
+     * Default gallery page.
+     * @return gallery model.
+     */
+    @RequestMapping(value = "/photo/gallery", method = RequestMethod.GET)
     public ModelAndView generateLinks() {
-        LOG.info("rendering gallery page ...");
+        LOG.info("Rendering gallery page ...");
         return getGalleryModel();
     }
 
     /**
-     * Evaluates given input, searches through file system using
-     * provided path for files with ".png" extension, if any files
-     * found copies them on server and redirects to gallery page.
-     * @param path path to folder, which contains photos.
-     * @return view name.
-     */
-    @RequestMapping(value = HOME, method = RequestMethod.POST)
-    public String addPhotos(@RequestParam String path) {
-        photoService.copyAll(path);
-
-        LOG.info("redirecting to gallery-page");
-        return "redirect:" + GALLERY;
-    }
-
-    /**
      * Loads files from server and generates response.
-     * @param filename name of the file to be fetched from resources.
+     * @param filename name of the file to be fetched from the resources.
      * @return response with status 200 (OK) if no exception occur
      * with status 404 (Not Found) otherwise.
      */
-    @RequestMapping(value = SINGLE_PICTURE, method = RequestMethod.GET)
+    @RequestMapping(value = "/photo/gallery/picture/{filename:.+}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<?> loadFile(@PathVariable String filename) {
         try {
-            LOG.debug("loading resource with name: {}", filename);
+            LOG.debug("Loading resource with name: {}", filename);
             return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
         } catch (Exception e) {
-            LOG.error("failed to load resource with name: {} error message: {}", filename, e.getMessage());
+            LOG.error("Failed to load resource with name: {} error message: {}", filename, e.getMessage());
             return ResponseEntity.notFound().build();
         }
     }
 
     /**
-     * Resizing each photo in gallery according to given parameters.
+     * Changes default picture resolution to custom one
+     * according to given parameters.
      * @param width width of the picture.
-     * @param height heigth of the picture.
-     * @return gallery view with resized images.
+     * @param height height of the picture.
+     * @return gallery model with transformed images.
      */
-    @RequestMapping(value = CUSTOM_RESOLUTION, method = RequestMethod.GET)
-    public ModelAndView resize(@PathVariable String width, @PathVariable String height) {
+    @RequestMapping(value = "/photo/gallery/wh/{width}x{height}", method = RequestMethod.GET)
+    public ModelAndView resize(@PathVariable String width,
+                               @PathVariable String height) {
         ModelAndView model = getGalleryModel();
 
         model.addObject("width", width);
         model.addObject("height", height);
-        LOG.debug("setting photo size: {} x {}", width, height);
+
+        LOG.debug("Setting picture size: {} x {}", width, height);
 
         return model;
     }
 
     /**
-     * Changing gallery theme.
-     * @return gallery view with dark theme.
+     * Applies dark background.
+     * @return gallery model with dark background.
      */
-    @RequestMapping(value = DARK_THEME, method = RequestMethod.GET)
+    @RequestMapping(value = "/photo/gallery/darkbackground", method = RequestMethod.GET)
     public ModelAndView showDark() {
         ModelAndView model = getGalleryModel();
 
-        LOG.trace("changing to dark theme ...");
+        LOG.info("Applying dark background...");
+
         model.addObject("isDark", true);
 
         return model;
     }
 
     /**
-     * Displaying every image with its original size.
-     * @return gallery view with images in original resolution.
+     * Transforms every picture to its original resolution.
+     * @return gallery model with images in original resolution.
      */
-    @RequestMapping(value = ORIGINAL, method = RequestMethod.GET)
+    @RequestMapping(value = "/photo/gallery/original", method = RequestMethod.GET)
     public ModelAndView showOriginal() {
         ModelAndView model = getGalleryModel();
 
-        LOG.trace("resizing photos to its original resolution ...");
+        LOG.trace("Resizing pictures to its original resolution...");
+
         model.addObject("isOriginal", true);
 
         return model;
@@ -179,13 +175,15 @@ public class PhotoController {
 
     /**
      * Default model for building gallery page.
-     * @return default view of gallery page.
+     * @return default gallery model.
      */
     private ModelAndView getGalleryModel() {
         ModelAndView model = new ModelAndView("index");
+        List<Link> links = DirectoryScanner.generateLinks();
 
         model.addObject("gallery", true);
-        model.addObject("links", DirectoryScanner.generateLinks(ROOT));
+        model.addObject("links", links);
+        model.addObject("msg", links.size() + " pictures uploaded.");
         model.addObject("width", DEFAULT_SIZE);
         model.addObject("height", DEFAULT_SIZE);
 
@@ -194,10 +192,11 @@ public class PhotoController {
 
     /**
      * Default model for building home page.
-     * @return default view of home page.
+     * @return default home model.
      */
     private ModelAndView getHomeModel() {
         ModelAndView model = new ModelAndView("index");
+
         model.addObject("home", true);
 
         return model;

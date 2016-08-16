@@ -1,12 +1,11 @@
 # RESTful-Photo-Gallery
 ![](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery.svg?branch=master)
-![](https://coveralls.io/repos/github/aveOwl/RESTful-Photo-Gallery/badge.svg?branch=master)
 
 **Technologies involved**
-* [Maven](https://maven.apache.org/)
-* [Maven Jacoco Plugin](http://www.eclemma.org/jacoco/trunk/doc/maven.html)
-* [Maven Checkstyle Plugin](https://maven.apache.org/plugins/maven-checkstyle-plugin/)
-* [Spring Boot + Embedded Tomcat](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
+* [Gradle](https://gradle.org/)
+* [Gradle Jacoco Plugin](https://docs.gradle.org/current/userguide/jacoco_plugin.html)
+* [Gradle Checkstyle Plugin](https://docs.gradle.org/current/userguide/checkstyle_plugin.html)
+* [Spring Boot](http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/)
 * [Spring Thymeleaf](http://www.thymeleaf.org/documentation.html)
 * [Bootstrap](http://getbootstrap.com/)
 * [Spring HATEOAS](http://docs.spring.io/spring-hateoas/docs/current/reference/html/)

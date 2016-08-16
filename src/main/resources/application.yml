@@ -1,7 +1,20 @@
+##
+# Allow Thymeleaf templates to be reloaded at dev time.
+##
 spring:
   thymeleaf:
     cache: false
+
+##
+# Tomcat configuration.
+##
 server:
-  tomcat:
-    basedir: targe/tomcat
-  port: 9000
+  port: 8080
+
+##
+# Logging configuration.
+##
+logging:
+  level:
+    com:
+      gallery: debug

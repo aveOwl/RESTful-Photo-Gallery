@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Error</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"
+          href="/static/css/bootstrap.min.css" />
+    <link rel="stylesheet" th:href="@{/css/style.css}"
+          href="/static/css/style.css" />
+</head>
+
+<body class="error-body">
+
+<div class="error-container">
+
+    <h1 class="error-h1" th:text="${code}"></h1>
+
+    <p class="error-p">
+        <strong th:text="${reason}"></strong>
+    </p>
+
+    <p class="error-p" th:text="${description}"></p>
+
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+
+</html>

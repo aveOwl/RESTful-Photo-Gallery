@@ -1,0 +1,75 @@
+group 'Photo-Gallery'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+    }
+
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+apply plugin: 'jacoco'
+apply plugin: 'checkstyle'
+
+ext {
+    commonsVersion = '2.4'
+    jacocoVersion = '0.7.4.201502262128'
+    checkstyleVersion = '6.16.1'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
+    compile group: 'org.springframework.boot', name: 'spring-boot-devtools'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
+
+    compile group: 'commons-io', name: 'commons-io', version: commonsVersion
+
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+}
+
+jacoco {
+    toolVersion = jacocoVersion
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled = true // human readable
+        xml.enabled = true // required by coveralls
+    }
+}
+
+checkstyle {
+    toolVersion = checkstyleVersion
+    config = rootProject.resources.text.fromFile('checkstyle.xml')
+}
+
+test.finalizedBy jacocoTestReport
+
+bootRun {
+    addResources = true
+}
+
+bootRepackage {
+    mainClass = '*Application'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.10'
+}

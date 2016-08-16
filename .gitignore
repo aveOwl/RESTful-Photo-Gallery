@@ -1,4 +1,4 @@
+.gradle/
+build/
+out/
 .idea/
-target/
-RESTful-Photo-Gallery.iml
-upload-dir/

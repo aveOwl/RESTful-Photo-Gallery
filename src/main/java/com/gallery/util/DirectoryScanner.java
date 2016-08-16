@@ -1,9 +1,6 @@
-package com.gallery.restful.util;
+package com.gallery.util;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-
-import com.gallery.restful.controller.PhotoController;
+import com.gallery.controller.PhotoController;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +10,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
  * Provides directory scan to find any files.
@@ -41,35 +41,36 @@ public class DirectoryScanner {
      * @return retrieved files.
      */
     public static List<File> search(String path) {
-        LOG.debug("starting search for files with extensions: {}", Arrays.asList(EXTENSIONS));
+        LOG.debug("Searching for files with extensions: {}", Arrays.asList(EXTENSIONS));
 
         File directory = new File(path);
 
-        listOfFiles = (List<File>) FileUtils.listFiles(directory, EXTENSIONS, true);
+        if (!directory.isDirectory()) {
+            throw new IllegalArgumentException("Inputted path does not point to any existing directory.");
+        }
 
-        LOG.debug("in folder: {} found {} files", path, listOfFiles.size());
+        listOfFiles = (List<File>) FileUtils.listFiles(directory, EXTENSIONS, true);
+        LOG.debug("In folder: {} found {} files", path, listOfFiles.size());
         return listOfFiles;
     }
 
     /**
      * Generates useful links to operate on a web page
      * with attributes such as rel and href.
-     * @param path path to directory.
      * @return list of links.
      */
-    public static List<Link> generateLinks(String path) {
-        Link link;
+    public static List<Link> generateLinks() {
         List<Link> links = new ArrayList<>();
 
-        listOfFiles = search(path);
-
-        LOG.info("generating HATEOAS images links ...");
+        if (listOfFiles == null) {
+            throw new NullPointerException("File list is null. Never searched for files.");
+        }
 
         for (File file : listOfFiles) {
-            link = linkTo(methodOn(PhotoController.class)
+            Link link = linkTo(methodOn(PhotoController.class)
                     .loadFile(file.getName()))
                     .withRel(file.getName());
-            LOG.debug("creating link: {}", link);
+            LOG.debug("Creating link: {}", link);
             links.add(link);
         }
         return links;

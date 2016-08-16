@@ -1,9 +1,10 @@
-package com.gallery.restful.service;
+package com.gallery.service;
 
-import com.gallery.restful.util.DirectoryScanner;
+import com.gallery.util.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static com.gallery.restful.controller.PhotoController.ROOT;
+import static com.gallery.controller.PhotoController.ROOT;
 
 /**
  * Basic implementation for {@link PhotoService} interface.
@@ -32,17 +33,21 @@ public class PhotoServiceImpl implements PhotoService {
      * @param path path to folder containing photos.
      */
     @Override
-    public void copyAll(String path) {
-        LOG.debug("loading files from directory by given path: {}", path);
+    public void copyAll(final String path) {
+        FileSystemUtils.deleteRecursively(new File(ROOT));
+
+        LOG.debug("Loading files from directory by given path: {}", path);
 
         List<File> files = DirectoryScanner.search(path);
 
         if (files != null && !files.isEmpty()) {
-            LOG.debug("load {} files", files.size());
+            LOG.debug("Loaded {} files", files.size());
             try {
+                Files.createDirectory(Paths.get(ROOT));
+
                 for (File file : files) {
                     InputStream inputStream = new FileInputStream(file);
-                    LOG.debug("copying file: {} to server", file.getName());
+                    LOG.debug("Copying file: {} to server", file.getName());
                     Files.copy(inputStream, Paths.get(ROOT, file.getName()));
                 }
             } catch (IOException | RuntimeException e) {
