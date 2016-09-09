@@ -1,5 +1,5 @@
 # RESTful-Photo-Gallery
-![](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery.svg?branch=master)
+[![Build Status](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery.svg?branch=master)](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery)
 
 **Technologies involved**
 * [Gradle](https://gradle.org/)
