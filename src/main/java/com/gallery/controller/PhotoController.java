@@ -1,7 +1,6 @@
 package com.gallery.controller;
 
 import com.gallery.service.PhotoService;
-import com.gallery.util.DirectoryScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import java.util.List;
  * The PhotoController is a RESTful web service controller.
  */
 @Controller
-public class PhotoController extends BaseController {
+public class PhotoController {
 
     /**
      * Logging system.
@@ -179,7 +178,7 @@ public class PhotoController extends BaseController {
      */
     private ModelAndView getGalleryModel() {
         ModelAndView model = new ModelAndView("index");
-        List<Link> links = DirectoryScanner.generateLinks();
+        List<Link> links = photoService.generateLinks();
 
         model.addObject("gallery", true);
         model.addObject("links", links);

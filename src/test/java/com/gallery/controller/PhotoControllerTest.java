@@ -36,10 +36,8 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
  * WebMvcTests for {@link PhotoController} class.
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest
-@Import(PhotoController.class)
+@WebMvcTest(controllers = {PhotoController.class, PhotoControllerAdvice.class})
 public class PhotoControllerTest {
-
     /**
      * Home page URI.
      */
@@ -53,13 +51,20 @@ public class PhotoControllerTest {
     /**
      * A {@link MockMvc} instance.
      */
+    @Autowired
     private MockMvc mvc;
 
     /**
-     * A controller class to be tested.
+     * A {@link PhotoController} class to be tested.
      */
     @Autowired
     private PhotoController photoController;
+
+    /**
+     * A {@link PhotoControllerAdvice} class.
+     */
+    @Autowired
+    private PhotoControllerAdvice photoControllerAdvice;
 
     /**
      * A mock of {@link PhotoService} class.
@@ -85,7 +90,9 @@ public class PhotoControllerTest {
      */
     @Before
     public void setUp() throws Exception {
-        this.mvc = standaloneSetup(photoController).build();
+        this.mvc = standaloneSetup(photoController)
+                .setControllerAdvice(photoControllerAdvice)
+                .build();
     }
 
     /**
@@ -96,7 +103,8 @@ public class PhotoControllerTest {
     public void shouldRedirect() throws Exception {
         this.mvc.perform(get("/"))
                 .andExpect(status().isFound())
-                .andExpect(redirectedUrl(HOME_URI));
+                .andExpect(redirectedUrl(HOME_URI))
+                .andExpect(model().hasNoErrors());
     }
 
     /**
@@ -112,6 +120,18 @@ public class PhotoControllerTest {
     }
 
     /**
+     * Should display gallery page without any errors.
+     * @throws Exception on error.
+     */
+    @Test
+    public void shouldRenderGalleryPage() throws Exception {
+        this.mvc.perform(get(GALLERY_URI))
+                .andExpect(status().isOk())
+                .andExpect(model().attribute("gallery", true))
+                .andExpect(model().hasNoErrors());
+    }
+
+    /**
      * Should proceed field submission without errors.
      * Should redirect to gallery page.
      * @throws Exception on error.
@@ -123,28 +143,6 @@ public class PhotoControllerTest {
         this.mvc.perform(post(HOME_URI).param("path", path))
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(GALLERY_URI));
-
-        verify(photoService, only()).copyAll(path);
-    }
-
-    /**
-     * Should not proceed field submission on non-existing
-     * directory path.
-     * Should render error page with exception message.
-     * @throws Exception on error.
-     */
-    @Test
-    public void shouldRenderErrorPage() throws Exception {
-        final String path = "/smth";
-        final String errorMsg = "test exception";
-
-        doThrow(new IllegalArgumentException(errorMsg))
-                .when(photoService).copyAll(path);
-
-        this.mvc.perform(post(HOME_URI).param("path", path))
-                .andExpect(status().isInternalServerError())
-                .andExpect(view().name("error"))
-                .andExpect(model().attribute("description", containsString(errorMsg)));
 
         verify(photoService, only()).copyAll(path);
     }
@@ -183,5 +181,68 @@ public class PhotoControllerTest {
                 .andExpect(model().attribute("width", "200"))
                 .andExpect(model().attribute("height", "500"))
                 .andExpect(model().hasNoErrors());
+    }
+
+    /**
+     * Should render error view with exception message and
+     * HTTP status code 400 Bad Request.
+     * @throws Exception on error.
+     */
+    @Test
+    public void shouldRenderErrorPageWithBadRequestStatus() throws Exception {
+        final String path = "/smth";
+        final String errorMsg = "test exception";
+
+        doThrow(new IllegalArgumentException(errorMsg))
+                .when(photoService).copyAll(path);
+
+        this.mvc.perform(post(HOME_URI).param("path", path))
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("error"))
+                .andExpect(model().attribute("description", containsString(errorMsg)));
+
+        verify(photoService, only()).copyAll(path);
+    }
+
+    /**
+     * Should render error view with exception message and
+     * HTTP status code 404 Not Found.
+     * @throws Exception on error.
+     */
+    @Test
+    public void shouldRenderErrorPageWithNotFoundStatus() throws Exception {
+        final String path = "/smth";
+        final String errorMsg = "test exception";
+
+        doThrow(new NullPointerException(errorMsg))
+                .when(photoService).copyAll(path);
+
+        this.mvc.perform(post(HOME_URI).param("path", path))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("error"))
+                .andExpect(model().attribute("description", containsString(errorMsg)));
+
+        verify(photoService, only()).copyAll(path);
+    }
+
+    /**
+     * Should render error view with exception message and
+     * HTTP status code 500 Internal Server Error.
+     * @throws Exception on error.
+     */
+    @Test
+    public void shouldRenderErrorPageWithInternalServerErrorStatus() throws Exception {
+        final String path = "/smth";
+        final String errorMsg = "test exception";
+
+        doThrow(new RuntimeException(errorMsg))
+                .when(photoService).copyAll(path);
+
+        this.mvc.perform(post(HOME_URI).param("path", path))
+                .andExpect(status().isInternalServerError())
+                .andExpect(view().name("error"))
+                .andExpect(model().attribute("description", containsString(errorMsg)));
+
+        verify(photoService, only()).copyAll(path);
     }
 }
