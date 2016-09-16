@@ -176,8 +176,11 @@ public class PhotoController {
     private ModelAndView getGalleryModel() {
         ModelAndView model = new ModelAndView("index");
 
-        model.addObject("links",
-                links == null ? new ArrayList<>() : links);
+        if (links == null) {
+            model.addObject("links", new ArrayList<>());
+        } else {
+            model.addObject("links", links);
+        }
 
         model.addObject("gallery", true);
         model.addObject("width", DEFAULT_SIZE);
