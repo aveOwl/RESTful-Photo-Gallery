@@ -1,10 +1,11 @@
 package com.gallery.controller;
 
-import com.gallery.service.PhotoService;
+import com.gallery.service.StorageService;
+import com.gallery.service.StorageServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.Resource;
 import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -15,11 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 /**
- * The PhotoController is a RESTful web service controller.
+ * The {@link PhotoController} is a RESTful web service controller.
  */
 @Controller
 public class PhotoController {
@@ -30,35 +36,27 @@ public class PhotoController {
     private static final Logger LOG = LoggerFactory.getLogger(PhotoController.class);
 
     /**
-     * Server side folder where upload
-     * files store.
-     */
-    public static final String ROOT = "upload-dir";
-
-    /**
      * Default picture resolution.
      */
     private static final int DEFAULT_SIZE = 200;
 
     /**
-     * Classpath resource loader.
+     * List of useful links to files.
      */
-    private final ResourceLoader resourceLoader;
+    private static List<Link> links;
 
     /**
-     * Photo service {@link PhotoService}.
+     * {@link StorageService} class.
      */
-    private final PhotoService photoService;
+    private StorageService storageService;
 
     /**
-     * Injecting dependencies.
-     * @param resourceLoader to be injected.
-     * @param photoService to be injected.
+     * Initializing {@link StorageServiceImpl} instance.
+     * @param storageService instance of {@link StorageServiceImpl}.
      */
     @Autowired
-    public PhotoController(ResourceLoader resourceLoader, PhotoService photoService) {
-        this.resourceLoader = resourceLoader;
-        this.photoService = photoService;
+    public PhotoController(final StorageService storageService) {
+        this.storageService = storageService;
     }
 
     /**
@@ -77,18 +75,25 @@ public class PhotoController {
     @RequestMapping(value = "/photo", method = RequestMethod.GET)
     public ModelAndView home() {
         LOG.info("Rendering home page...");
-        return getHomeModel();
+        return this.getHomeModel();
     }
 
     /**
-     * Using provided path copies all files on to the server.
+     * Copies all files found in the system by provided path
+     * to the server storage.
      * @param path path to folder, which contains photos.
      * @return redirection to gallery page.
      */
     @RequestMapping(value = "/photo", method = RequestMethod.POST)
     public String addPictures(@RequestParam String path) {
 
-        photoService.copyAll(path);
+        storageService.save(path);
+
+        links = storageService.loadAll()
+                .map(p -> linkTo(methodOn(PhotoController.class)
+                        .loadFile(p.getFileName().toString()))
+                        .withRel(p.getFileName().toString()))
+                .collect(Collectors.toList());
 
         LOG.info("Redirecting to gallery-page...");
         return "redirect:/photo/gallery";
@@ -105,26 +110,18 @@ public class PhotoController {
     }
 
     /**
-     * Loads files from server and generates response.
+     * Loads files from server storage and generates response.
      * @param filename name of the file to be fetched from the resources.
-     * @return response with status 200 (OK) if no exception occur
-     * with status 404 (Not Found) otherwise.
+     * @return response with status 200 (OK).
      */
     @RequestMapping(value = "/photo/gallery/picture/{filename:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<?> loadFile(@PathVariable String filename) {
-        try {
-            LOG.debug("Loading resource with name: {}", filename);
-            return ResponseEntity.ok(resourceLoader.getResource("file:" + Paths.get(ROOT, filename).toString()));
-        } catch (Exception e) {
-            LOG.error("Failed to load resource with name: {} error message: {}", filename, e.getMessage());
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Resource> loadFile(@PathVariable String filename) {
+        return ResponseEntity.ok(storageService.loadAsResource(filename));
     }
 
     /**
-     * Changes default picture resolution to custom one
-     * according to given parameters.
+     * Changes default picture resolution to custom one according to given parameters.
      * @param width width of the picture.
      * @param height height of the picture.
      * @return gallery model with transformed images.
@@ -178,11 +175,11 @@ public class PhotoController {
      */
     private ModelAndView getGalleryModel() {
         ModelAndView model = new ModelAndView("index");
-        List<Link> links = photoService.generateLinks();
+
+        model.addObject("links",
+                links == null ? new ArrayList<>() : links);
 
         model.addObject("gallery", true);
-        model.addObject("links", links);
-        model.addObject("msg", links.size() + " pictures uploaded.");
         model.addObject("width", DEFAULT_SIZE);
         model.addObject("height", DEFAULT_SIZE);
 

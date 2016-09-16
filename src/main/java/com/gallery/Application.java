@@ -1,23 +1,23 @@
 package com.gallery;
 
+import com.gallery.service.StorageService;
+import com.gallery.service.StorageServiceImpl;
+import com.gallery.util.StorageProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.FileSystemUtils;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static com.gallery.controller.PhotoController.ROOT;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Launches spring application.
  */
 @SpringBootApplication
+@EnableConfigurationProperties(StorageProperties.class)
 public class Application {
     /**
      * Logging system.
@@ -33,5 +33,19 @@ public class Application {
     public static void main(final String[] args) {
         LOG.info("starting spring application ...");
         SpringApplication.run(Application.class, args);
+    }
+
+    /**
+     * Initialize server storage directory.
+     * @param storageService service to process over storage.
+     * @return initialized storage directory.
+     */
+    @Bean
+    CommandLineRunner init(final StorageService storageService) {
+        return (args) -> {
+            LOG.info("Initializing server storage...");
+            storageService.deleteAll();
+            storageService.init();
+        };
     }
 }

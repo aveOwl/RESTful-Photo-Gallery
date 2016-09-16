@@ -67,7 +67,7 @@ bootRun {
 }
 
 bootRepackage {
-    mainClass = '*Application'
+    mainClass = 'com.gallery.Application'
 }
 
 task wrapper(type: Wrapper) {
