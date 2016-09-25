@@ -34,14 +34,14 @@ repositories {
 }
 
 dependencies {
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf'
-    compile group: 'org.springframework.boot', name: 'spring-boot-devtools'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-hateoas'
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "org.springframework.boot:spring-boot-starter-thymeleaf"
+    compile "org.springframework.boot:spring-boot-devtools"
+    compile "org.springframework.boot:spring-boot-starter-hateoas"
 
-    compile group: 'commons-io', name: 'commons-io', version: commonsVersion
+    compile "commons-io:commons-io:${commonsVersion}"
 
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+    compile "org.springframework.boot:spring-boot-starter-test"
 }
 
 jacoco {

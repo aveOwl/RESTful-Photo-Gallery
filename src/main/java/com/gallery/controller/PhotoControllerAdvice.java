@@ -17,9 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 @ControllerAdvice
 public class PhotoControllerAdvice {
 
-    /**
-     * Logging system for this class.
-     */
     private static final Logger LOG = LoggerFactory.getLogger(PhotoControllerAdvice.class);
 
     /**
@@ -30,7 +27,7 @@ public class PhotoControllerAdvice {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(StorageException.class)
     public ModelAndView storageException(final StorageException ex) {
-        return getErrorModel(HttpStatus.BAD_REQUEST, ex);
+        return this.getDefaultErrorModel(HttpStatus.BAD_REQUEST, ex);
     }
 
     /**
@@ -41,7 +38,7 @@ public class PhotoControllerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(StorageFileNotFoundException.class)
     public ModelAndView storageFileNotFoundException(final StorageFileNotFoundException ex) {
-        return getErrorModel(HttpStatus.NOT_FOUND, ex);
+        return this.getDefaultErrorModel(HttpStatus.NOT_FOUND, ex);
     }
 
     /**
@@ -52,7 +49,7 @@ public class PhotoControllerAdvice {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ModelAndView exception(final Exception ex) {
-        return getErrorModel(HttpStatus.INTERNAL_SERVER_ERROR, ex);
+        return this.getDefaultErrorModel(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 
     /**
@@ -62,7 +59,7 @@ public class PhotoControllerAdvice {
      * @param <E> instance of the Exception class.
      * @return complete error model for the view.
      */
-    private <E extends Exception> ModelAndView getErrorModel(final HttpStatus status, final E e) {
+    private <E extends Exception> ModelAndView getDefaultErrorModel(final HttpStatus status, final E e) {
         LOG.error(e.getMessage());
 
         final ModelAndView model = new ModelAndView("error");
