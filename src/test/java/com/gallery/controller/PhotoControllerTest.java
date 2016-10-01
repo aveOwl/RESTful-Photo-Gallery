@@ -37,13 +37,17 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 @WebMvcTest(PhotoController.class)
 public class PhotoControllerTest {
     private static final String HOME_URI = "/photo";
-
     private static final String GALLERY_URI = "/photo/gallery";
-
     private static final String ERROR_MSG = "test-error";
 
     @Autowired
     private MockMvc mvc;
+
+    @Autowired
+    private PhotoController photoController;
+
+    @Autowired
+    private PhotoControllerAdvice photoControllerAdvice;
 
     @MockBean
     private StorageService storageService;
@@ -54,18 +58,9 @@ public class PhotoControllerTest {
     @Before
     public void setUp() throws Exception {
         // when
-        this.mvc = standaloneSetup(new PhotoController(this.storageService))
-                .setControllerAdvice(new PhotoControllerAdvice())
+        this.mvc = standaloneSetup(this.photoController)
+                .setControllerAdvice(this.photoControllerAdvice)
                 .build();
-    }
-
-    @Test
-    public void shouldRedirectToHomePage() throws Exception {
-        // when
-        this.mvc.perform(get("/"))
-                .andExpect(status().isFound())
-                .andExpect(redirectedUrl(HOME_URI))
-                .andExpect(model().hasNoErrors());
     }
 
     @Test
@@ -83,7 +78,7 @@ public class PhotoControllerTest {
         String path = this.tf.newFolder().getAbsolutePath();
         Stream<Path> stream = Stream.of();
 
-        given(storageService.loadAll())
+        given(this.storageService.loadAll())
                 .willReturn(stream);
 
         // when

@@ -44,8 +44,8 @@ public interface StorageService {
     Path load(String fileName);
 
     /**
-     * Loads all files on server storage.
-     * @return all files in server storage.
+     * Loads all files from the server storage.
+     * @return stream of file names.
      */
     Stream<Path> loadAll();
 

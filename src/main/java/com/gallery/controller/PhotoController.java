@@ -23,14 +23,12 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Controller
+@RequestMapping(value = "/photo")
 public class PhotoController {
-
     private static final Logger LOG = LoggerFactory.getLogger(PhotoController.class);
-
     private static final int DEFAULT_RESOLUTION = 200;
 
     private List<Link> links;
-
     private StorageService storageService;
 
     @Autowired
@@ -38,30 +36,19 @@ public class PhotoController {
         this.storageService = storageService;
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String redirectToHomePage() {
-        return "redirect:/photo";
-    }
-
-    @RequestMapping(value = "/photo", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET)
     public ModelAndView renderHomePage() {
         LOG.info("Rendering home page...");
         return this.getDefaultHomeModel();
     }
 
-    /**
-     * Copies all files found in the system by provided path
-     * to the server storage.
-     * @param path path to folder, which contains photos.
-     * @return redirection to gallery page.
-     */
-    @RequestMapping(value = "/photo", method = RequestMethod.POST)
-    public String loadPictures(final @RequestParam String path) {
-        storageService.save(path);
+    @RequestMapping(method = RequestMethod.POST)
+    public String renderGalleryPageWithUploadedPictures(final @RequestParam String path) {
+        this.storageService.save(path);
 
-        links = storageService.loadAll()
+        this.links = this.storageService.loadAll()
                 .map(p -> linkTo(methodOn(PhotoController.class)
-                        .loadPicture(p.getFileName().toString()))
+                        .renderSinglePicture(p.getFileName().toString()))
                         .withRel(p.getFileName().toString()))
                 .collect(Collectors.toList());
 
@@ -69,31 +56,20 @@ public class PhotoController {
         return "redirect:/photo/gallery";
     }
 
-    @RequestMapping(value = "/photo/gallery", method = RequestMethod.GET)
+    @RequestMapping(value = "/gallery", method = RequestMethod.GET)
     public ModelAndView renderGalleryPage() {
         LOG.info("Rendering gallery page ...");
         return this.getDefaultGalleryModel();
     }
 
-    /**
-     * Loads files from server storage and generates response.
-     * @param filename name of the file to be fetched from the resources.
-     * @return response with status 200 (OK).
-     */
-    @RequestMapping(value = "/photo/gallery/picture/{filename:.+}", method = RequestMethod.GET)
+    @RequestMapping(value = "/gallery/picture/{filename:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<Resource> loadPicture(final @PathVariable String filename) {
+    public ResponseEntity<Resource> renderSinglePicture(final @PathVariable String filename) {
         return ResponseEntity.ok(storageService.loadAsResource(filename));
     }
 
-    /**
-     * Changes default picture resolution to custom one according to given parameters.
-     * @param width new width of the picture.
-     * @param height nwe height of the picture.
-     * @return gallery model with transformed images.
-     */
-    @RequestMapping(value = "/photo/gallery/wh/{width}x{height}", method = RequestMethod.GET)
-    public ModelAndView resizePicture(final @PathVariable String width,
+    @RequestMapping(value = "/gallery/wh/{width}x{height}", method = RequestMethod.GET)
+    public ModelAndView resizePicturesOnGalleryPage(final @PathVariable String width,
                                       final @PathVariable String height) {
         ModelAndView model = this.getDefaultGalleryModel();
 
@@ -105,8 +81,8 @@ public class PhotoController {
         return model;
     }
 
-    @RequestMapping(value = "/photo/gallery/darkbackground", method = RequestMethod.GET)
-    public ModelAndView applyDarkTheme() {
+    @RequestMapping(value = "/gallery/darkbackground", method = RequestMethod.GET)
+    public ModelAndView renderGalleryPageWithBlackBackground() {
         ModelAndView model = this.getDefaultGalleryModel();
 
         LOG.info("Applying dark theme...");
@@ -116,8 +92,8 @@ public class PhotoController {
         return model;
     }
 
-    @RequestMapping(value = "/photo/gallery/original", method = RequestMethod.GET)
-    public ModelAndView applyOriginalResolution() {
+    @RequestMapping(value = "/gallery/original", method = RequestMethod.GET)
+    public ModelAndView renderGalleryPageWithPicturesInOriginalResolution() {
         ModelAndView model = this.getDefaultGalleryModel();
 
         LOG.trace("Resizing pictures to its original resolution...");
