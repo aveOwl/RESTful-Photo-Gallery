@@ -5,35 +5,31 @@ import com.gallery.util.StorageFileNotFoundException;
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @Service
-public class StorageServiceImpl implements StorageService {
+public class StorageServiceImpl implements StorageService, InitService, DestroyService {
     private static final Logger LOG = LoggerFactory.getLogger(StorageServiceImpl.class);
-
     private final Path storagePath = Paths.get("server-storage");
-
     private final String[] fileExtensions = {"png"};
 
     /**
-     * {@inheritDoc}
+     * Creates storage directory.
      */
     @Override
     public void init() {
@@ -48,12 +44,12 @@ public class StorageServiceImpl implements StorageService {
      * {@inheritDoc}
      */
     @Override
-    public void save(final String path) {
-        List<File> files = this.findFilesWithExtensions(path, this.fileExtensions);
+    public void save(final Path path) {
         try {
+            List<Path> files = this.findFilesWithExtensions(path, this.fileExtensions);
             this.saveFilesOnServer(files);
         } catch (IOException e) {
-            LOG.error("Failed to store files {}", e.getLocalizedMessage());
+            LOG.error("Failed to store files {} : {}", e.getClass().getSimpleName(), e.getLocalizedMessage());
             throw new StorageException("Failed to store files", e);
         }
     }
@@ -65,15 +61,16 @@ public class StorageServiceImpl implements StorageService {
      * @param extensions file fileExtensions.
      * @return list of files if any found, otherwise empty list.
      */
-    private List<File> findFilesWithExtensions(final String path, final String[] extensions) {
-        File directory = new File(path);
-
-        if (!directory.isDirectory()) {
+    private List<Path> findFilesWithExtensions(final Path path, final String[] extensions) throws IOException {
+        if (!Files.isDirectory(path)) {
             throw new StorageException("Inputted path does not point to any existing directory");
         }
 
-        List<File> files = (List<File>) FileUtils.listFiles(directory, extensions, true);
-        LOG.debug("In directory {} found {} files", directory.getAbsolutePath(), files.size());
+        List<Path> files = FileUtils.listFiles(path.toFile(), extensions, true)
+                .stream()
+                .map(File::toPath)
+                .collect(Collectors.toList());
+        LOG.debug("In directory {} found {} files", path.toAbsolutePath(), files.size());
 
         return files;
     }
@@ -84,15 +81,14 @@ public class StorageServiceImpl implements StorageService {
      * @param files list of files to store.
      * @throws IOException on error.
      */
-    private void saveFilesOnServer(List<File> files) throws IOException {
+    private void saveFilesOnServer(List<Path> files) throws IOException {
         if (files.isEmpty()) {
             LOG.error("File list is empty: {}", files.size());
             throw new StorageException("Failed to store files. No files provided.");
         }
 
-        for (File file : files) {
-            InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-            Files.copy(inputStream, this.storagePath.resolve(file.getName()), REPLACE_EXISTING);
+        for (Path file : files) {
+            Files.copy(file, this.storagePath.resolve(file.getFileName()), REPLACE_EXISTING);
         }
 
         LOG.debug("Copied {} files on server", files.size());
@@ -116,21 +112,13 @@ public class StorageServiceImpl implements StorageService {
 
     /**
      * {@inheritDoc}
-     */
-    @Override
-    public Path load(final String fileName) {
-        return this.storagePath.resolve(fileName);
-    }
-
-    /**
-     * {@inheritDoc}
      * If for provided fileName no files found throws {@link StorageFileNotFoundException},
      * otherwise returns corresponding resource.
      */
     @Override
     public Resource loadAsResource(final String fileName) {
         try {
-            Path file = load(fileName);
+            Path file = this.storagePath.resolve(fileName);
             Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
@@ -144,10 +132,11 @@ public class StorageServiceImpl implements StorageService {
     }
 
     /**
-     * {@inheritDoc}
+     * Removes storage directory and all inner directories
+     * recursively.
      */
     @Override
-    public void deleteAll() {
+    public void destroy() {
         FileSystemUtils.deleteRecursively(this.storagePath.toFile());
     }
 }

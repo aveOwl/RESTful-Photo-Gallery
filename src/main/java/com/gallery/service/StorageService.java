@@ -17,31 +17,11 @@ import java.util.stream.Stream;
  * </p>
  */
 public interface StorageService {
-
     /**
-     * Creates storage directory.
+     * Uploads all files found in directory corresponding to provided path.
+     * @param path path to server storage.
      */
-    void init();
-
-    /**
-     * Removes storage directory and all inner directories
-     * recursively.
-     */
-    void deleteAll();
-
-    /**
-     * Uploads all files found in directory corresponding to provided
-     * path to server storage.
-     * @param path path to directory containing files for upload.
-     */
-    void save(String path);
-
-    /**
-     * Returns path to file on server storage.
-     * @param fileName name of the file to be loaded.
-     * @return relative path to file on server storage.
-     */
-    Path load(String fileName);
+    void save(Path path);
 
     /**
      * Loads all files from the server storage.
@@ -52,7 +32,7 @@ public interface StorageService {
     /**
      * Loads file from server storage as a resource.
      * @param fileName name of the file to be loaded.
-     * @return resource containing file to load.
+     * @return resource containing the file.
      */
     Resource loadAsResource(String fileName);
 }

@@ -4,8 +4,9 @@ import com.gallery.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
 import org.springframework.hateoas.Link;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -44,7 +47,7 @@ public class PhotoController {
 
     @RequestMapping(method = RequestMethod.POST)
     public String renderGalleryPageWithUploadedPictures(final @RequestParam String path) {
-        this.storageService.save(path);
+        this.storageService.save(Paths.get(path));
 
         this.links = this.storageService.loadAll()
                 .map(p -> linkTo(methodOn(PhotoController.class)
@@ -65,7 +68,7 @@ public class PhotoController {
     @RequestMapping(value = "/gallery/picture/{filename:.+}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<Resource> renderSinglePicture(final @PathVariable String filename) {
-        return ResponseEntity.ok(storageService.loadAsResource(filename));
+        return ResponseEntity.ok(this.storageService.loadAsResource(filename));
     }
 
     @RequestMapping(value = "/gallery/wh/{width}x{height}", method = RequestMethod.GET)

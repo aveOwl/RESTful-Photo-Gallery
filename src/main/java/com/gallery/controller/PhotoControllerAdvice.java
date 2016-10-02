@@ -17,8 +17,6 @@ import org.springframework.web.servlet.ModelAndView;
 @ControllerAdvice
 public class PhotoControllerAdvice {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PhotoControllerAdvice.class);
-
     /**
      * Handles <code>StorageException</code> thrown from web service controller methods.
      * @param ex A <code>StorageException</code> instance.
@@ -60,8 +58,6 @@ public class PhotoControllerAdvice {
      * @return complete error model for the view.
      */
     private <E extends Exception> ModelAndView getDefaultErrorModel(final HttpStatus status, final E e) {
-        LOG.error(e.getMessage());
-
         final ModelAndView model = new ModelAndView("error");
 
         final String desc = "There is no content available. " + e.getMessage();

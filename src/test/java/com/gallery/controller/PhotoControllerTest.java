@@ -1,5 +1,7 @@
 package com.gallery.controller;
 
+import com.gallery.service.DestroyService;
+import com.gallery.service.InitService;
 import com.gallery.service.StorageService;
 import com.gallery.util.StorageException;
 import com.gallery.util.StorageFileNotFoundException;
@@ -9,22 +11,21 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -52,6 +53,12 @@ public class PhotoControllerTest {
     @MockBean
     private StorageService storageService;
 
+    @MockBean
+    private InitService initService;
+
+    @MockBean
+    private DestroyService destroyService;
+
     @Rule
     public TemporaryFolder tf = new TemporaryFolder();
 
@@ -72,11 +79,14 @@ public class PhotoControllerTest {
                 .andExpect(model().hasNoErrors());
     }
 
+    /**
+     * TODO should test that links are being created as well.
+     */
     @Test
-    public void shouldRegisterWithoutError() throws Exception {
+    public void shouldUploadPicturesAndRedirectToGallery() throws Exception {
         // given
         String path = this.tf.newFolder().getAbsolutePath();
-        Stream<Path> stream = Stream.of();
+        Stream<Path> stream = Stream.of(Paths.get("file1"), Paths.get("file1"));
 
         given(this.storageService.loadAll())
                 .willReturn(stream);
@@ -87,17 +97,17 @@ public class PhotoControllerTest {
                 .andExpect(redirectedUrl(GALLERY_URI));
 
         // then
-        verify(this.storageService, atLeastOnce()).save(path);
+        verify(this.storageService, atLeastOnce()).save(Paths.get(path));
         verify(this.storageService, atLeastOnce()).loadAll();
     }
 
     @Test
-    public void shouldFailToRegisterOnInvalidPath() throws Exception {
+    public void shouldFailToUploadPicturesAndRenderErrorPage() throws Exception {
         // given
         String path = this.tf.newFolder().getAbsolutePath();
 
-        given(this.storageService.loadAll())
-                .willThrow(new StorageException(ERROR_MSG));
+        doThrow(new StorageException(ERROR_MSG))
+                .when(this.storageService).save(Paths.get(path));
 
         // when
         this.mvc.perform(post(HOME_URI).param("path", path))
@@ -106,12 +116,12 @@ public class PhotoControllerTest {
                 .andExpect(model().attribute("description", containsString(ERROR_MSG)));
 
         // then
-        verify(this.storageService, atLeastOnce()).save(path);
-        verify(this.storageService, atLeastOnce()).loadAll();
+        verify(this.storageService, atLeastOnce()).save(Paths.get(path));
+        verify(this.storageService, never()).loadAll();
     }
 
     @Test
-    public void shouldRenderErrorPageWithNotFoundStatus() throws Exception {
+    public void shouldFailToLoadNonExistingFileAndRenderErrorPage() throws Exception {
         // given
         String fileName = "test-file";
 
@@ -134,7 +144,8 @@ public class PhotoControllerTest {
         // given
         String path = "/smth";
 
-        doThrow(new NullPointerException(ERROR_MSG)).when(this.storageService).save(path);
+        doThrow(new NullPointerException(ERROR_MSG))
+                .when(this.storageService).save(Paths.get(path));
 
         // when
         this.mvc.perform(post(HOME_URI).param("path", path))
@@ -143,7 +154,8 @@ public class PhotoControllerTest {
                 .andExpect(model().attribute("description", containsString(ERROR_MSG)));
 
         // then
-        verify(this.storageService, atLeastOnce()).save(path);
+        verify(this.storageService, atLeastOnce()).save(Paths.get(path));
+        verify(this.storageService, never()).loadAll();
     }
 
     @Test
