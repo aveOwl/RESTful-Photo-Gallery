@@ -2,7 +2,6 @@ package com.gallery;
 
 import com.gallery.service.DestroyService;
 import com.gallery.service.InitService;
-import com.gallery.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -22,7 +21,7 @@ public class Application extends WebMvcConfigurerAdapter {
     }
 
     @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
+    public void addViewControllers(final ViewControllerRegistry registry) {
         LOG.info("Redirecting to home page...");
         registry.addViewController("/").setViewName("redirect:/photo");
     }

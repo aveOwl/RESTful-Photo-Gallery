@@ -26,7 +26,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 public class StorageServiceImpl implements StorageService, InitService, DestroyService {
     private static final Logger LOG = LoggerFactory.getLogger(StorageServiceImpl.class);
     private final Path storagePath = Paths.get("server-storage");
-    private final String[] fileExtensions = {"png"};
+    private final String[] extensions = {"png"};
 
     /**
      * Creates storage directory.
@@ -44,9 +44,9 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
      * {@inheritDoc}
      */
     @Override
-    public void save(final Path path) {
+    public void save(final Path src) {
         try {
-            List<Path> files = this.findFilesWithExtensions(path, this.fileExtensions);
+            final List<Path> files = this.findFilesWithExtensions(src, this.extensions);
             this.saveFilesOnServer(files);
         } catch (IOException e) {
             LOG.error("Failed to store files {} : {}", e.getClass().getSimpleName(), e.getLocalizedMessage());
@@ -55,35 +55,37 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
     }
 
     /**
-     * Searches directory by given path for files with specified fileExtensions
+     * Searches in directory by given path for files with specified extensions
      * and returns files if any found, otherwise returns empty list.
-     * @param path path to directory to search files in.
+     *
+     * @param src path to directory to search files in.
      * @param extensions file fileExtensions.
      * @return list of files if any found, otherwise empty list.
      */
-    private List<Path> findFilesWithExtensions(final Path path, final String[] extensions) throws IOException {
-        if (!Files.isDirectory(path)) {
+    private List<Path> findFilesWithExtensions(final Path src, final String[] extensions) {
+        if (!Files.isDirectory(src)) {
             throw new StorageException("Inputted path does not point to any existing directory");
         }
 
-        List<Path> files = FileUtils.listFiles(path.toFile(), extensions, true)
+        final List<Path> files = FileUtils.listFiles(src.toFile(), extensions, true)
                 .stream()
                 .map(File::toPath)
                 .collect(Collectors.toList());
-        LOG.debug("In directory {} found {} files", path.toAbsolutePath(), files.size());
 
+        LOG.debug("In directory {} found {} files", src.toAbsolutePath(), files.size());
         return files;
     }
 
     /**
      * If no files are provided throws {@link StorageException}, otherwise
      * copies all files to server storage.
+     *
      * @param files list of files to store.
      * @throws IOException on error.
      */
     private void saveFilesOnServer(List<Path> files) throws IOException {
         if (files.isEmpty()) {
-            LOG.error("File list is empty: {}", files.size());
+            LOG.error("File list is empty");
             throw new StorageException("Failed to store files. No files provided.");
         }
 
@@ -99,8 +101,9 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
      */
     @Override
     public Stream<Path> loadAll() {
-        LOG.info("Loading files from server storage...");
         try {
+            LOG.info("Loading files from server storage...");
+
             return Files.walk(this.storagePath, 1)
                     .filter(path -> !path.equals(this.storagePath))
                     .map(this.storagePath::relativize);
@@ -118,8 +121,8 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
     @Override
     public Resource loadAsResource(final String fileName) {
         try {
-            Path file = this.storagePath.resolve(fileName);
-            Resource resource = new UrlResource(file.toUri());
+            final Path file = this.storagePath.resolve(fileName);
+            final Resource resource = new UrlResource(file.toUri());
 
             if (resource.exists() || resource.isReadable()) {
                 return resource;

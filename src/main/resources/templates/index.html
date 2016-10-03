@@ -46,7 +46,8 @@
 
         <div class="container">
             <div class="text-center" th:if="${links.isEmpty()}">
-                <p class="account-p">No files found. Note: searching for files with '.png' extensions.</p>
+                <p class="account-p">You should try to <a th:href="@{/photo}">create</a> gallery first.</p>
+                <p class="account-p">Note: searching for files with '.png' extensions.</p>
             </div>
             <div class="row" th:class="${isOriginal} ? '' : 'col-lg-3'" th:each="link : ${links}">
                 <a th:href="${link.href}">
@@ -57,7 +58,7 @@
         </div>
 
         <div class="col-lg-12">
-            <p class="text-info modal-footer" th:text="${links.size()}"> Images Uploaded</p>
+            <p class="text-info modal-footer" th:text="${links.size()}"></p>
         </div>
     </div>
 

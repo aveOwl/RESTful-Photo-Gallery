@@ -4,9 +4,8 @@ import com.gallery.service.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.Link;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -31,7 +29,7 @@ public class PhotoController {
     private static final Logger LOG = LoggerFactory.getLogger(PhotoController.class);
     private static final int DEFAULT_RESOLUTION = 200;
 
-    private List<Link> links;
+    private List<Link> links = new ArrayList<>();
     private StorageService storageService;
 
     @Autowired
@@ -73,8 +71,8 @@ public class PhotoController {
 
     @RequestMapping(value = "/gallery/wh/{width}x{height}", method = RequestMethod.GET)
     public ModelAndView resizePicturesOnGalleryPage(final @PathVariable String width,
-                                      final @PathVariable String height) {
-        ModelAndView model = this.getDefaultGalleryModel();
+                                                    final @PathVariable String height) {
+        final ModelAndView model = this.getDefaultGalleryModel();
 
         model.addObject("width", width);
         model.addObject("height", height);
@@ -86,7 +84,7 @@ public class PhotoController {
 
     @RequestMapping(value = "/gallery/darkbackground", method = RequestMethod.GET)
     public ModelAndView renderGalleryPageWithBlackBackground() {
-        ModelAndView model = this.getDefaultGalleryModel();
+        final ModelAndView model = this.getDefaultGalleryModel();
 
         LOG.info("Applying dark theme...");
 
@@ -97,7 +95,7 @@ public class PhotoController {
 
     @RequestMapping(value = "/gallery/original", method = RequestMethod.GET)
     public ModelAndView renderGalleryPageWithPicturesInOriginalResolution() {
-        ModelAndView model = this.getDefaultGalleryModel();
+        final ModelAndView model = this.getDefaultGalleryModel();
 
         LOG.trace("Resizing pictures to its original resolution...");
 
@@ -107,14 +105,9 @@ public class PhotoController {
     }
 
     private ModelAndView getDefaultGalleryModel() {
-        ModelAndView model = new ModelAndView("index");
+        final ModelAndView model = new ModelAndView("index");
 
-        if (links == null) {
-            model.addObject("links", new ArrayList<>());
-        } else {
-            model.addObject("links", links);
-        }
-
+        model.addObject("links", links);
         model.addObject("gallery", true);
         model.addObject("width", DEFAULT_RESOLUTION);
         model.addObject("height", DEFAULT_RESOLUTION);
@@ -123,7 +116,7 @@ public class PhotoController {
     }
 
     private ModelAndView getDefaultHomeModel() {
-        ModelAndView model = new ModelAndView("index");
+        final ModelAndView model = new ModelAndView("index");
 
         model.addObject("home", true);
 
