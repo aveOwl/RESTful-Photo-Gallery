@@ -29,12 +29,13 @@ public class PhotoController {
     private static final Logger LOG = LoggerFactory.getLogger(PhotoController.class);
     private static final int DEFAULT_RESOLUTION = 200;
 
-    private List<Link> links = new ArrayList<>();
+    private List<Link> links;
     private StorageService storageService;
 
     @Autowired
     public PhotoController(final StorageService storageService) {
         this.storageService = storageService;
+        this.links = new ArrayList<>();
     }
 
     @RequestMapping(method = RequestMethod.GET)

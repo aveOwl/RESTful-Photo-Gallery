@@ -9,14 +9,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * The PhotoControllerAdvice class provide a consistent response
- * when Exceptions are thrown from <code>@RequestMapping</code> Controller methods.
+ * The PhotoControllerAdvice class provides a consistent response
+ * when Exceptions are thrown from <code>@RequestMapping</code> controller methods.
  */
 @ControllerAdvice
 public class PhotoControllerAdvice {
 
     /**
      * Handles <code>StorageException</code> thrown from web service controller methods.
+     *
      * @param ex A <code>StorageException</code> instance.
      * @return response with HTTP status code 400 and exception message.
      */
@@ -28,6 +29,7 @@ public class PhotoControllerAdvice {
 
     /**
      * Handles <code>StorageFileNotFoundException</code> thrown from web service controller methods.
+     *
      * @param ex A <code>StorageFileNotFoundException</code> instance.
      * @return response with HTTP status code 404 and exception message.
      */
@@ -39,6 +41,7 @@ public class PhotoControllerAdvice {
 
     /**
      * Handles <code>Exception</code> thrown from web service controller methods.
+     *
      * @param ex A <code>Exception</code> instance.
      * @return response with HTTP status code 500 and exception message.
      */
@@ -49,7 +52,8 @@ public class PhotoControllerAdvice {
     }
 
     /**
-     * Creates error model for error page view.
+     * Creates error model for the error page view.
+     *
      * @param status response status code for given exception.
      * @param e exception that needs to be handled.
      * @param <E> instance of the Exception class.

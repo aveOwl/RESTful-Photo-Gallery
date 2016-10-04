@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
@@ -36,7 +37,7 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
         try {
             Files.createDirectory(this.storagePath);
         } catch (IOException e) {
-            throw new StorageException("Could not initialize storage", e);
+            throw new StorageException("Could not initialize storage.", e);
         }
     }
 
@@ -45,12 +46,13 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
      */
     @Override
     public void save(final Path src) {
+        Assert.notNull(src, "Source directory can't be null.");
         try {
             final List<Path> files = this.findFilesWithExtensions(src, this.extensions);
             this.saveFilesOnServer(files);
         } catch (IOException e) {
-            LOG.error("Failed to store files {} : {}", e.getClass().getSimpleName(), e.getLocalizedMessage());
-            throw new StorageException("Failed to store files", e);
+            LOG.error("Failed to store files {} : {}.", e.getClass().getSimpleName(), e.getLocalizedMessage());
+            throw new StorageException("Failed to store files.", e);
         }
     }
 
@@ -64,7 +66,7 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
      */
     private List<Path> findFilesWithExtensions(final Path src, final String[] extensions) {
         if (!Files.isDirectory(src)) {
-            throw new StorageException("Inputted path does not point to any existing directory");
+            throw new StorageException("Inputted path does not point to any existing directory.");
         }
 
         final List<Path> files = FileUtils.listFiles(src.toFile(), extensions, true)
@@ -72,7 +74,7 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
                 .map(File::toPath)
                 .collect(Collectors.toList());
 
-        LOG.debug("In directory {} found {} files", src.toAbsolutePath(), files.size());
+        LOG.debug("In directory {} found {} files.", src.toAbsolutePath(), files.size());
         return files;
     }
 
@@ -85,7 +87,7 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
      */
     private void saveFilesOnServer(List<Path> files) throws IOException {
         if (files.isEmpty()) {
-            LOG.error("File list is empty");
+            LOG.error("File list is empty.");
             throw new StorageException("Failed to store files. No files provided.");
         }
 
@@ -108,8 +110,8 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
                     .filter(path -> !path.equals(this.storagePath))
                     .map(this.storagePath::relativize);
         } catch (IOException e) {
-            LOG.error("Failed during reading stored files {}", e.getLocalizedMessage());
-            throw new StorageException("Failed to read stored files", e);
+            LOG.error("Failed during reading stored files {}.", e.getLocalizedMessage());
+            throw new StorageException("Failed to read stored files.", e);
         }
     }
 

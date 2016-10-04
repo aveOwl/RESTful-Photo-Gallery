@@ -65,8 +65,8 @@ public class PhotoControllerTest {
     @Before
     public void setUp() throws Exception {
         // when
-        this.mvc = standaloneSetup(this.photoController)
-                .setControllerAdvice(this.photoControllerAdvice)
+        this.mvc = standaloneSetup(photoController)
+                .setControllerAdvice(photoControllerAdvice)
                 .build();
     }
 
@@ -85,10 +85,10 @@ public class PhotoControllerTest {
     @Test
     public void shouldUploadPicturesAndRedirectToGallery() throws Exception {
         // given
-        String path = this.tf.newFolder().getAbsolutePath();
+        String path = tf.newFolder().getAbsolutePath();
         Stream<Path> stream = Stream.of(Paths.get("file1"), Paths.get("file1"));
 
-        given(this.storageService.loadAll())
+        given(storageService.loadAll())
                 .willReturn(stream);
 
         // when
@@ -97,17 +97,17 @@ public class PhotoControllerTest {
                 .andExpect(redirectedUrl(GALLERY_URI));
 
         // then
-        verify(this.storageService, atLeastOnce()).save(Paths.get(path));
-        verify(this.storageService, atLeastOnce()).loadAll();
+        verify(storageService, atLeastOnce()).save(Paths.get(path));
+        verify(storageService, atLeastOnce()).loadAll();
     }
 
     @Test
     public void shouldFailToUploadPicturesAndRenderErrorPage() throws Exception {
         // given
-        String path = this.tf.newFolder().getAbsolutePath();
+        String path = tf.newFolder().getAbsolutePath();
 
         doThrow(new StorageException(ERROR_MSG))
-                .when(this.storageService).save(Paths.get(path));
+                .when(storageService).save(Paths.get(path));
 
         // when
         this.mvc.perform(post(HOME_URI).param("path", path))
@@ -116,8 +116,8 @@ public class PhotoControllerTest {
                 .andExpect(model().attribute("description", containsString(ERROR_MSG)));
 
         // then
-        verify(this.storageService, atLeastOnce()).save(Paths.get(path));
-        verify(this.storageService, never()).loadAll();
+        verify(storageService, atLeastOnce()).save(Paths.get(path));
+        verify(storageService, never()).loadAll();
     }
 
     @Test
@@ -125,7 +125,7 @@ public class PhotoControllerTest {
         // given
         String fileName = "test-file";
 
-        given(this.storageService.loadAsResource(fileName))
+        given(storageService.loadAsResource(fileName))
                 .willThrow(new StorageFileNotFoundException(ERROR_MSG));
 
         // when
@@ -135,7 +135,7 @@ public class PhotoControllerTest {
                 .andExpect(model().attribute("description", containsString(ERROR_MSG)));
 
         // then
-        verify(this.storageService, atLeastOnce()).loadAsResource(fileName);
+        verify(storageService, atLeastOnce()).loadAsResource(fileName);
     }
 
 
@@ -145,7 +145,7 @@ public class PhotoControllerTest {
         String path = "/smth";
 
         doThrow(new NullPointerException(ERROR_MSG))
-                .when(this.storageService).save(Paths.get(path));
+                .when(storageService).save(Paths.get(path));
 
         // when
         this.mvc.perform(post(HOME_URI).param("path", path))
@@ -154,8 +154,8 @@ public class PhotoControllerTest {
                 .andExpect(model().attribute("description", containsString(ERROR_MSG)));
 
         // then
-        verify(this.storageService, atLeastOnce()).save(Paths.get(path));
-        verify(this.storageService, never()).loadAll();
+        verify(storageService, atLeastOnce()).save(Paths.get(path));
+        verify(storageService, never()).loadAll();
     }
 
     @Test
