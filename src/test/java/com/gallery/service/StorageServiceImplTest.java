@@ -21,18 +21,14 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest(classes = StorageServiceImpl.class)
 public class StorageServiceImplTest {
     private static final String TEST_FILE_NAME = "test-file";
-
-    @Autowired
-    private StorageService storageService;
-
-    @MockBean
-    private Resource resource;
-
     @Rule
     public TemporaryFolder tf = new TemporaryFolder();
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+    @Autowired
+    private StorageService storageService;
+    @MockBean
+    private Resource resource;
 
     @Test
     public void shouldNotLoadFileAsResourceIfResourceNotExists() throws Exception {

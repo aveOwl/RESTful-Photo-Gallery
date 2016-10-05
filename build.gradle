@@ -4,6 +4,7 @@ version '1.0-SNAPSHOT'
 buildscript {
     ext {
         springBootVersion = '1.4.0.RELEASE'
+        dockerVersion = '1.2'
     }
 
     repositories {
@@ -24,6 +25,7 @@ ext {
     commonsVersion = '2.4'
     jacocoVersion = '0.7.4.201502262128'
     checkstyleVersion = '6.16.1'
+    bootstrapVersion = '3.3.7'
 }
 
 sourceCompatibility = 1.8
@@ -40,6 +42,7 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-hateoas"
 
     compile "commons-io:commons-io:${commonsVersion}"
+    compile "org.webjars.bower:bootstrap:${bootstrapVersion}"
 
     compile "org.springframework.boot:spring-boot-starter-test"
 }

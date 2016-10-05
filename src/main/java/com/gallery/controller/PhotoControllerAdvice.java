@@ -55,8 +55,8 @@ public class PhotoControllerAdvice {
      * Creates error model for the error page view.
      *
      * @param status response status code for given exception.
-     * @param e exception that needs to be handled.
-     * @param <E> instance of the Exception class.
+     * @param e      exception that needs to be handled.
+     * @param <E>    instance of the Exception class.
      * @return complete error model for the view.
      */
     private <E extends Exception> ModelAndView getDefaultErrorModel(final HttpStatus status, final E e) {

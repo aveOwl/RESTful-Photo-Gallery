@@ -6,15 +6,9 @@ import java.nio.file.Path;
 import java.util.stream.Stream;
 
 /**
- * <p>
- *     The {@link StorageService} interface defines all public business behaviours
- *     associated with file operations such as uploading, storing and loading
- *     multiple files.
- * </p>
- * <p>
- *     This interface should be injected into StorageService clients, not the
- *     {@link StorageServiceImpl} class.
- * </p>
+ * The {@link StorageService} interface defines all public business behaviours
+ * associated with file operations such as uploading, storing and loading
+ * multiple files.
  */
 public interface StorageService {
     /**

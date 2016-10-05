@@ -40,27 +40,20 @@ public class PhotoControllerTest {
     private static final String HOME_URI = "/photo";
     private static final String GALLERY_URI = "/photo/gallery";
     private static final String ERROR_MSG = "test-error";
-
-    @Autowired
-    private MockMvc mvc;
-
-    @Autowired
-    private PhotoController photoController;
-
-    @Autowired
-    private PhotoControllerAdvice photoControllerAdvice;
-
-    @MockBean
-    private StorageService storageService;
-
-    @MockBean
-    private InitService initService;
-
-    @MockBean
-    private DestroyService destroyService;
-
     @Rule
     public TemporaryFolder tf = new TemporaryFolder();
+    @Autowired
+    private MockMvc mvc;
+    @Autowired
+    private PhotoController photoController;
+    @Autowired
+    private PhotoControllerAdvice photoControllerAdvice;
+    @MockBean
+    private StorageService storageService;
+    @MockBean
+    private InitService initService;
+    @MockBean
+    private DestroyService destroyService;
 
     @Before
     public void setUp() throws Exception {

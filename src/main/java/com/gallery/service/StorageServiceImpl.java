@@ -60,7 +60,7 @@ public class StorageServiceImpl implements StorageService, InitService, DestroyS
      * Searches in directory by given path for files with specified extensions
      * and returns files if any found, otherwise returns empty list.
      *
-     * @param src path to directory to search files in.
+     * @param src        path to directory to search files in.
      * @param extensions file fileExtensions.
      * @return list of files if any found, otherwise empty list.
      */

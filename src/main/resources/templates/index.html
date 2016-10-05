@@ -3,8 +3,8 @@
 
 <head>
     <title>PhotoGallery</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.7/dist/css/bootstrap.css}"/>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
 </head>
 
@@ -17,11 +17,11 @@
     <div class="row text-center">
         <h1 class="page-header text-info">Type your pic folder</h1>
 
-        <form th:action="@{/photo}" method="post" role="form" >
+        <form th:action="@{/photo}" method="post" role="form">
 
             <div class="row">
                 <div class="col-lg-4 col-lg-offset-4">
-                    <input type="text" class="form-control" name="path" placeholder="C:\photos\mypics" />
+                    <input type="text" class="form-control" name="path" placeholder="C:\photos\mypics"/>
                 </div>
             </div>
 
@@ -33,7 +33,7 @@
         </form>
     </div>
 
-    <hr />
+    <hr/>
     <div th:replace="fragments/footer :: footer"></div>
 </div>
 
@@ -51,8 +51,9 @@
             </div>
             <div class="row" th:class="${isOriginal} ? '' : 'col-lg-3'" th:each="link : ${links}">
                 <a th:href="${link.href}">
-                    <img th:unless="${isOriginal}" th:src="${link.href}" th:alt="${link.rel}" th:width="${width}" th:height="${height}" />
-                    <img th:if="${isOriginal}" th:src="${link.href}" th:alt="${link.rel}" />
+                    <img th:unless="${isOriginal}" th:src="${link.href}" th:alt="${link.rel}" th:width="${width}"
+                         th:height="${height}"/>
+                    <img th:if="${isOriginal}" th:src="${link.href}" th:alt="${link.rel}"/>
                 </a>
             </div>
         </div>
@@ -62,7 +63,7 @@
         </div>
     </div>
 
-    <hr />
+    <hr/>
     <div th:replace="fragments/footer :: footer"></div>
 </div>
 
