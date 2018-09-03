@@ -1,4 +1,4 @@
-# RESTful-Photo-Gallery
+# Photo-Gallery
 [![Build Status](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery.svg?branch=master)](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery)
 
 **Technologies involved**
