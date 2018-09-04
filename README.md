@@ -1,5 +1,6 @@
 # Photo-Gallery
-[![Build Status](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery.svg?branch=master)](https://travis-ci.org/aveOwl/RESTful-Photo-Gallery)
+[![Build Status](https://travis-ci.org/aveowl/Photo-Gallery.svg?branch=master)](https://travis-ci.org/aveowl/Photo-Gallery)
+[![Coverage Status](https://coveralls.io/repos/github/aveowl/Photo-Gallery/badge.svg?branch=master)](https://coveralls.io/github/aveowl/Photo-Gallery?branch=master)
 
 **Technologies involved**
 * [Gradle](https://gradle.org/)
