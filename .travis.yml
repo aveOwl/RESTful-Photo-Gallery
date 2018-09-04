@@ -1,7 +1,10 @@
 language: java
-sudo: false # faster builds
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
 
-script: ./gradlew build
+after_success:
+- ./gradlew jacocoTestReport coveralls
+
+after_failure:
+- ./gradlew clean check --debug

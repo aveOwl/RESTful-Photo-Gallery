@@ -1,5 +1,21 @@
-.gradle/
-build/
-out/
-.idea/
+# gradle build dir
+build/*
+!build/gradle
+
+# gradle local dir
+.gradle
+.gradletasknamecache
+
+# eclipse files
+.settings
+.classpath
+.project
+bin
+
+# idea files
+*.iml
+*.ipr
+*.iws
+.idea
+out
 server-storage

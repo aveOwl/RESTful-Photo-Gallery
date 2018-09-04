@@ -1,25 +1,24 @@
-group 'Photo-Gallery'
-version '1.0-SNAPSHOT'
-
 buildscript {
-    ext {
-        springBootVersion = '1.4.0.RELEASE'
-        dockerVersion = '1.2'
-    }
-
     repositories {
         jcenter()
     }
-
     dependencies {
-        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE"
     }
 }
 
-apply plugin: 'java'
+plugins {
+    id 'java'
+    id 'idea'
+    id 'jacoco'
+    id 'groovy'
+    id 'com.github.kt3k.coveralls' version '2.6.3'
+}
+
 apply plugin: 'spring-boot'
-apply plugin: 'jacoco'
-apply plugin: 'checkstyle'
+
+group 'Photo-Gallery'
+version '1.0-SNAPSHOT'
 
 ext {
     commonsVersion = '2.4'
@@ -47,23 +46,11 @@ dependencies {
     compile "org.springframework.boot:spring-boot-starter-test"
 }
 
-jacoco {
-    toolVersion = jacocoVersion
-}
-
 jacocoTestReport {
     reports {
-        html.enabled = true // human readable
-        xml.enabled = true // required by coveralls
+        xml.enabled = true
     }
 }
-
-checkstyle {
-    toolVersion = checkstyleVersion
-    config = rootProject.resources.text.fromFile('checkstyle.xml')
-}
-
-test.finalizedBy jacocoTestReport
 
 bootRun {
     addResources = true
